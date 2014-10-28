@@ -3,6 +3,7 @@ package edu.swarthmore.cs.moodtracker.util;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 
@@ -11,6 +12,8 @@ import java.io.ByteArrayOutputStream;
  * Stores the information of an AppUsage table entry in the Track database.
  */
 public class AppUsageEntry {
+    public static final String TAG = "AppUsageEntry";
+    
     public String PackageName = "";
     public int UsageTimeSec = 0;
     public String AppName = "";
@@ -45,33 +48,38 @@ public class AppUsageEntry {
 
         // Get the Package Name column
         int index = cursor.getColumnIndex(TrackContract.AppUsageSchema.COLUMN_PACKAGE);
-        if (index >= 0) {
+        if (index >= 0)
             this.PackageName = cursor.getString(index);
-        }
+        else
+            Log.e(TAG, "AppUsageEntry(Cursor): COLUMN_PACKAGE not found");
 
         // Get the App Name column
         index = cursor.getColumnIndex(TrackContract.AppInfoSchema.COLUMN_APP_NAME);
-        if (index >= 0) {
+        if (index >= 0)
             this.AppName = cursor.getString(index);
-        }
+        else
+            Log.e(TAG, "AppUsageEntry(Cursor): COLUMN_APP_NAME not found");
 
         // Get the App Name column
         index = cursor.getColumnIndex(TrackContract.AppInfoSchema.COLUMN_APP_ICON);
-        if (index >= 0) {
+        if (index >= 0)
             this.populateIconFromByteArray(cursor.getBlob(index));
-        }
+        else
+            Log.e(TAG, "AppUsageEntry(Cursor): COLUMN_APP_ICON not found");
 
         // Get the Usage Time column
         index = cursor.getColumnIndex(TrackContract.AppUsageSchema.COLUMN_USAGE_SEC);
-        if (index >= 0) {
+        if (index >= 0)
             this.UsageTimeSec = cursor.getInt(index);
-        }
+        else
+            Log.e(TAG, "AppUsageEntry(Cursor): COLUMN_USAGE_SEC not found");
 
         // Get the Date column
         index = cursor.getColumnIndex(TrackContract.AppUsageSchema.COLUMN_DATE);
-        if (index >= 0) {
+        if (index >= 0)
             this.DaysSinceEpoch = cursor.getLong(index);
-        }
+        else
+            Log.e(TAG, "AppUsageEntry(Cursor): COLUMN_DATE not found");
 
         cursor.moveToNext();
     }
