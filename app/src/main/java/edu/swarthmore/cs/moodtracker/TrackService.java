@@ -6,15 +6,18 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.TimeZone;
 
 import edu.swarthmore.cs.moodtracker.util.AppUsageEntry;
 import edu.swarthmore.cs.moodtracker.util.TrackDatabase;
@@ -25,7 +28,7 @@ import edu.swarthmore.cs.moodtracker.util.TrackDatabase;
  */
 public class TrackService extends Service{
 
-    public static final String TAG = "TRACK_SERVICE";
+    public static final String TAG = "TrackService";
 
     // Binder given to clients
     private final IBinder mBinder = new TrackBinder();
@@ -34,16 +37,15 @@ public class TrackService extends Service{
     private TrackDatabase mDatabase;
 
     /* Variables for tracking App Usage info */
+    private ActivityManager mActivityManager = null;
+    private PackageManager mPackageManager = null;
+    private HashSet<String> mFilteredSystemPackagesSet = null;
     private HashMap<String, AppUsageEntry> mAppUsageInfo;
     private int mInterval = 1000;
     private Handler mAppUsageTimer = new Handler();
-    private Runnable mAppUsageUpdateCallback;
-    private ActivityManager mActivityManager;
-
-    // Used to translate package name to app name.
-    List<PackageInfo> mInstalledPackages = null;
-    PackageManager mPackageManager = null;
-
+    private Runnable mAppUsageUpdateCallback = null;
+    private TimeZone mMyTimeZone = TimeZone.getDefault();
+    private long mCurrentDate = 0;  // Current date represented by days since epoch.
     /**
      * Class used for the client Binder.  We can safely return the service itself because
      * we know this service is only going to be used by our application.
@@ -60,36 +62,9 @@ public class TrackService extends Service{
         Log.d(TAG, "onCreate()");
         mDatabase = TrackDatabase.getInstance(this);
 
-        // Initialize package name -> app name translate tools
-        mPackageManager = getPackageManager();
-        mInstalledPackages = mPackageManager.getInstalledPackages(0);
-
         // Initialize and run App Usage tracking.
         initializeAppUsageTracking();
         mAppUsageUpdateCallback.run();
-    }
-
-    /**
-     * Initialize App Usage tracking.
-     * Construct ActivityManager, usageInfo HashMap, and the timed callback.
-     */
-    private void initializeAppUsageTracking() {
-        mActivityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-        mAppUsageInfo = new HashMap<String, AppUsageEntry>();
-
-        // Load existing app usage entries from database.
-        ArrayList<AppUsageEntry> existingEntries = mDatabase.getAllAppUsage();
-        for (AppUsageEntry entry:existingEntries) {
-            mAppUsageInfo.put(entry.PackageName, entry);
-        }
-
-        mAppUsageUpdateCallback = new Runnable() {
-            @Override
-            public void run() {
-                updateAppUsage();
-                mAppUsageTimer.postDelayed(this, mInterval);
-            }
-        };
     }
 
     @Override
@@ -109,7 +84,7 @@ public class TrackService extends Service{
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind()");
 
-        saveEntriesToDatabase();
+        saveDataToDatabase();
         return false;
     }
 
@@ -120,90 +95,167 @@ public class TrackService extends Service{
         // Stop tracking app usage status.
         mAppUsageTimer.removeCallbacks(mAppUsageUpdateCallback);
 
-        saveEntriesToDatabase();
+        saveDataToDatabase();
     }
 
-
-    /**
-     * Update the App Usage track information.
-     * Called by mAppUsageTimer every [mInterval] milliseconds.
-     */
-    private void updateAppUsage() {
-
-        List<RunningAppProcessInfo> appProcesses = mActivityManager.getRunningAppProcesses();
-        for(RunningAppProcessInfo appProcess : appProcesses){
-            if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-                    && ! isSystemProcess(appProcess)){
-                // We have found a foreground app that's not system process.
-                // It's probably the app user is using right now. Add it to the app usage info.
-                String packageName = appProcess.processName;
-
-                // Update the app usage info HashMap.
-                if ( mAppUsageInfo.containsKey(packageName) ) {
-                    mAppUsageInfo.get(packageName).UsageTimeSec += 1;
-                }
-                else {
-                    String appName = getAppName(packageName);
-                    if (appName == null) {
-                        continue;
-                    }
-
-                    AppUsageEntry newEntry = new AppUsageEntry(packageName, appName, 1);
-                    mAppUsageInfo.put(packageName, newEntry);
-                }
-            }
-        }
-    }
-
-    /**
-     * Decide whether a process is Android system process or not.
-     * @param appProcess The running app process to be determined.
-     * @return True if appProcess is a system process, false otherwise.
-     */
-    private boolean isSystemProcess(RunningAppProcessInfo appProcess) {
-        return (appProcess.processName.contains("com.android")
-                || appProcess.processName.equals("system")
-                || appProcess.processName.contains("com.nuance"));
-    }
 
     /**
      * Get the current app usage info. Used by the activities bound to this service.
      * @return A collection of AppUsageEntry objects.
      */
     public List<AppUsageEntry> getCurrentAppUsageInfo() {
-        Collection<AppUsageEntry> entriesCollection = mAppUsageInfo.values();
-        List entriesList;
-        if (entriesCollection instanceof List) {
-            entriesList = (List) entriesCollection;
-        }
-        else {
-            entriesList = new ArrayList<AppUsageEntry>(entriesCollection);
-        }
-        return entriesList;
+        return new ArrayList<AppUsageEntry>(mAppUsageInfo.values());
     }
 
     /**
-     * Get the application name from package name.
-     * @param packageName Package name of an application.
-     * @return Name of the application, or null if packageName is not found in installed packages.
+     * Initialize App Usage tracking.
      */
-    private String getAppName(String packageName) {
-        for (PackageInfo pkg : mInstalledPackages) {
-            if ( pkg.packageName.equals(packageName) ){
-                //this is the application name
-                return pkg.applicationInfo.loadLabel(mPackageManager).toString();
+    private void initializeAppUsageTracking() {
+        // Construct activity manager and package manager.
+        mActivityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        mPackageManager = getPackageManager();
+
+        // Initialize the system package names set. These are the packages to ignore.
+        mFilteredSystemPackagesSet = new HashSet<String>();
+        String[] allowedSystemPackageNames = getResources().getStringArray(R.array.filtered_system_package_array);
+        for (String packageName: Arrays.asList(allowedSystemPackageNames)) {
+            mFilteredSystemPackagesSet.add(packageName);
+        }
+
+        // Set the current date (represented by days since epoch)
+        mCurrentDate = getDaysSinceEpoch();
+
+        // Initialize the app usage hashmap. Load today's usage data from database.
+        // TODO: combine duplicate code.
+        mAppUsageInfo = new HashMap<String, AppUsageEntry>();
+        ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(mCurrentDate);
+        for (AppUsageEntry entry:existingEntries) {
+            mAppUsageInfo.put(entry.PackageName, entry);
+        }
+
+        // Start the call back that updates app usage data every mInterval ms.
+        mAppUsageUpdateCallback = new Runnable() {
+            @Override
+            public void run() {
+                updateAppUsageInfo();
+                mAppUsageTimer.postDelayed(this, mInterval);
+            }
+        };
+    }
+
+    /**
+     * Update the App Usage track information.
+     * Called by mAppUsageTimer every [mInterval] milliseconds.
+     */
+    private void updateAppUsageInfo() {
+
+        checkForNewDay();
+
+        List<RunningAppProcessInfo> appProcesses = mActivityManager.getRunningAppProcesses();
+        for(RunningAppProcessInfo appProcessInfo : appProcesses){
+            // Skip non-foreground processes.
+            if (appProcessInfo.importance != RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
+                continue;
+
+            // If this process is important because it's a provider / service of a foreground app,
+            // then also ignore it. For example, com.android.providers.calendar will have
+            // foreground importance when user is using com.google.android.calendar , because
+            // it's the provider of the calendar app.
+            if (isProviderOrService(appProcessInfo))
+                continue;
+
+            // Get the package info of this process
+            String packageName = appProcessInfo.processName;
+            PackageInfo packageInfo;
+            try {
+                packageInfo = mPackageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+            }
+            catch (PackageManager.NameNotFoundException e) {
+                continue;
+            }
+
+            // If the first process is system process, then we are probably not opening an app. Break here.
+            // Examples include com.android.launcher and com.android.settings
+            if(isFilteredSystemPackage(packageInfo))
+                break;
+
+            // We have found a foreground app that's not system process.
+            // It's probably the app user is using right now. Add it to the app usage info.
+            if ( mAppUsageInfo.containsKey(packageName) ) {
+                mAppUsageInfo.get(packageName).UsageTimeSec += 1;
+            }
+            else {
+                String appName = packageInfo.applicationInfo.loadLabel(mPackageManager).toString();
+                BitmapDrawable appIcon = (BitmapDrawable) packageInfo.applicationInfo.loadIcon(getPackageManager());
+
+                AppUsageEntry newEntry = new AppUsageEntry(packageName, appName, appIcon.getBitmap(), 1, mCurrentDate);
+                mAppUsageInfo.put(packageName, newEntry);
+            }
+
+            // Break after we have caught 1 foreground process.
+            break;
+        }
+    }
+
+
+    /**
+     * Check whether we just passed 11:59:59 pm. If yes, save yesterday's data to database
+     * and initialize today's data.
+     */
+    private void checkForNewDay() {
+        long newDate = getDaysSinceEpoch();
+        if (newDate > mCurrentDate) {
+            saveDataToDatabase();
+            mCurrentDate = newDate;
+
+            // Initialize the app usage hashmap. Load today's usage data from database.
+            // TODO: combine duplicate code.
+            mAppUsageInfo = new HashMap<String, AppUsageEntry>();
+            ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(mCurrentDate);
+            for (AppUsageEntry entry:existingEntries) {
+                mAppUsageInfo.put(entry.PackageName, entry);
             }
         }
-        return null;
     }
+
+    /**
+     * Decide whether this app process is a provider or service.
+     * @param appProcessInfo Information of the running process.
+     * @return Boolean True if this process is a service or provider, false otherwise.
+     */
+    private boolean isProviderOrService(RunningAppProcessInfo appProcessInfo) {
+        return (appProcessInfo.importanceReasonCode == RunningAppProcessInfo.REASON_PROVIDER_IN_USE ||
+                appProcessInfo.importanceReasonCode == RunningAppProcessInfo.REASON_SERVICE_IN_USE);
+    }
+
+
+    /**
+     * Decide whether the given package is a system package, and if yes, whether it should
+     * be ignored.
+     * @param packageInfo Name of the package.
+     * @return True if packageInfo represents a system package that should be ignored (such as
+     * com.android.systemui). False otherwise.
+     */
+    private boolean isFilteredSystemPackage(PackageInfo packageInfo) {
+        //return ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0)
+        return mFilteredSystemPackagesSet.contains(packageInfo.packageName);
+    }
+
+
     /**
      * Write the tracked app usage info back to database (i.e. disk) to store them permanently.
      * Called in onUnbind() and onDestroy().
      */
-    private void saveEntriesToDatabase() {
-        Log.d(TAG, "Saving entries to database");
+    private void saveDataToDatabase() {
+        Log.d(TAG, "Saving data to database");
         for (AppUsageEntry entry : mAppUsageInfo.values()) {
             mDatabase.writeAppUsage(entry);
         }
+    }
+
+    private long getDaysSinceEpoch() {
+        long offset = mMyTimeZone.getOffset(System.currentTimeMillis());
+        long millis = System.currentTimeMillis() + offset;
+        return millis / (24*3600*1000);
     }
 }

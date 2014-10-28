@@ -1,0 +1,9 @@
+<resources>
+    <!-- Dimensions for larger device (minimum width 600dp), such as Nexus 7 tablets -->
+
+    <!-- Dimensions for app usage section -->
+    <dimen name="app_usage_list_item_height">60dp</dimen>
+    <dimen name="app_usage_list_name_indentation">20dp</dimen>
+    <dimen name="app_usage_list_name_fontsize">20sp</dimen>
+    <dimen name="app_usage_list_time_fontsize">20sp</dimen>
+</resources>

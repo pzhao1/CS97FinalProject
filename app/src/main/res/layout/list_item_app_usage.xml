@@ -3,20 +3,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="@dimen/app_usage_list_item_height">
+
+    <ImageView
+        android:id="@+id/list_field_app_icon"
+        android:layout_width="@dimen/app_usage_list_item_height"
+        android:layout_height="@dimen/app_usage_list_item_height"
+        android:padding="5dp"
+        />
 
     <TextView
         android:id="@+id/list_field_app_name"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="25sp"/>
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:textSize="@dimen/app_usage_list_name_fontsize"
+        android:paddingStart="@dimen/app_usage_list_name_indentation"
+        android:paddingEnd="0dp"
+        android:paddingLeft="@dimen/app_usage_list_name_indentation"
+        android:paddingRight="0dp"
+        android:gravity="center_vertical"/>
 
     <TextView
         android:id="@+id/list_field_time"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:textSize="25sp"/>
+        android:textSize="@dimen/app_usage_list_time_fontsize"
+        android:gravity="center_vertical"/>
 
 </LinearLayout>

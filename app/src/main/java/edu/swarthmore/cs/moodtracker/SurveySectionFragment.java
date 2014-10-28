@@ -11,23 +11,23 @@ import android.widget.TextView;
  * Created by Peng on 10/19/2014.
  * The fragment that shows Movement tracking information.
  */
-public class MovementSectionFragment extends Fragment {
+public class SurveySectionFragment extends Fragment {
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
 
-    public MovementSectionFragment() {
+    public SurveySectionFragment() {
         super();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_section_movement, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_section_survey, container, false);
 
         TextView labelTextView = (TextView) rootView.findViewById(R.id.section_label);
-        labelTextView.setText("This is the Movement tracking section");
+        labelTextView.setText("This is the survey section");
 
         return rootView;
     }

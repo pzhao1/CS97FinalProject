@@ -4,12 +4,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,23 +21,6 @@ public class MainActivity extends Activity
     // Current title of the action bar. Changes as we select different items of the navigation drawer.
     private CharSequence mTitle;
 
-    // A TrackService instance that keeps tracking phone usage in background.
-    private TrackService mService;
-
-    // Connection to mService
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            TrackService.TrackBinder binder = (TrackService.TrackBinder) iBinder;
-            mService = binder.getService();
-            finishSetupRequiringService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mService = null;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +29,7 @@ public class MainActivity extends Activity
         // Start and bind to the TrackService
         Intent intent = new Intent(this, TrackService.class);
         startService(intent);
-        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-    }
 
-    private void finishSetupRequiringService(){
         setContentView(R.layout.activity_main);
 
         // Construct the Fragment that displays navigation drawer.
@@ -67,6 +43,7 @@ public class MainActivity extends Activity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
+
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
@@ -76,7 +53,6 @@ public class MainActivity extends Activity
         switch (position) {
             case 0:
                 AppUsageSectionFragment usageFragment = new AppUsageSectionFragment();
-                usageFragment.setService(mService);
                 mTitle = getString(R.string.title_section1);
                 fragment = (Fragment) usageFragment;
                 break;
@@ -85,7 +61,7 @@ public class MainActivity extends Activity
                 mTitle = getString(R.string.title_section2);
                 break;
             case 2:
-                fragment = new MovementSectionFragment();
+                fragment = new SurveySectionFragment();
                 mTitle = getString(R.string.title_section3);
                 break;
         }
@@ -131,6 +107,5 @@ public class MainActivity extends Activity
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        unbindService(mServiceConnection);
     }
 }

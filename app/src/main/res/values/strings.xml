@@ -4,10 +4,50 @@
     <string name="app_name">Mood Tracker</string>
     <string name="title_section1">App Usage</string>
     <string name="title_section2">Text Analysis</string>
-    <string name="title_section3">Movement</string>
+    <string name="title_section3">Survey</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Strings for app usage section -->
+    <string name="app_usage_waiting_text">Waiting for service to load ...</string>
+    <string-array name="filtered_system_package_array">
+        <item>com.android.launcher</item>
+        <item>com.android.settings</item>
+        <item>com.android.phone</item>
+        <item>com.android.systemui</item>
+        <item>com.android.nfc</item>
+        <item>com.android.</item>
+        <item>com.android.packageinstaller</item>
+        <item>com.android.server.telecom</item>
+        <item>com.nuance.xt9.input</item>
+    </string-array>
+
+    <string-array name="allowed_system_packages_array">
+        <item>com.android.calculator2</item>
+        <item>com.google.android.calendar</item>
+        <item>com.google.android.GoogleCamera</item>
+        <item>com.android.chrome</item>
+        <item>com.google.android.deskclock</item>
+        <item>com.google.android.apps.currents</item>
+        <item>com.android.documentsui</item>
+        <item>com.google.android.apps.docs</item>
+        <item>com.google.earth</item>
+        <item>com.google.android.email</item>
+        <item>com.google.android.gallery3d</item>
+        <item>com.google.android.gm</item>
+        <item>com.google.android.apps.plus</item>
+        <item>com.google.android.talk</item>
+        <item>com.google.android.keep</item>
+        <item>com.google.android.apps.maps</item>
+        <item>com.android.contacts</item>
+        <item>com.google.android.apps.books</item>
+        <item>com.google.android.play.games</item>
+        <item>com.google.android.videos</item>
+        <item>com.google.android.apps.magazines</item>
+        <item>com.android.vending</item>
+        <item>com.quickoffice.android</item>
+        <item>com.google.android.youtube</item>
+    </string-array>
 </resources>

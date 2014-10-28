@@ -1,11 +1,15 @@
 package edu.swarthmore.cs.moodtracker.util;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+
+import edu.swarthmore.cs.moodtracker.util.TrackContract.AppInfoSchema;
+import edu.swarthmore.cs.moodtracker.util.TrackContract.AppUsageSchema;
 
 /**
  * Created by Peng on 10/19/2014.
@@ -17,6 +21,9 @@ public class TrackDatabase extends SQLiteOpenHelper {
 
     // Private factory instance.
     private static TrackDatabase sInstance = null;
+
+    // Application context of this database.
+    private Context mContext = null;
 
     /**
      * Static factory method to create a TrackDatabase instance or retrieve the existing instance
@@ -39,26 +46,38 @@ public class TrackDatabase extends SQLiteOpenHelper {
      * @param context The application context this database lives in
      */
     private TrackDatabase(Context context) {
-        super(context, TrackDatabaseContract.DATABASE_NAME, null, TrackDatabaseContract.DATABASE_VERSION);
+        super(context, TrackContract.DATABASE_NAME, null, TrackContract.DATABASE_VERSION);
+        mContext = context;
     }
 
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Create the AppUsage Table
-        String CREATE_USERS_TABLE = "CREATE TABLE " + TrackDatabaseContract.AppUsageSchema.TABLE_NAME + "("
-                + TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_PACKAGE + " Text PRIMARY KEY, "
-                + TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_APP + " TEXT, "
-                + TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_TIME + " INTEGER"
+        String CREATE_APP_USAGE_TABLE = "CREATE TABLE " + AppUsageSchema.TABLE_NAME + "("
+                + AppUsageSchema.COLUMN_PACKAGE + " Text, "
+                + AppUsageSchema.COLUMN_USAGE_SEC + " INTEGER, "
+                + AppUsageSchema.COLUMN_DATE + " INTEGER, "
+                + "PRIMARY KEY (" + AppUsageSchema.COLUMN_PACKAGE + ", " + AppUsageSchema.COLUMN_DATE + ")"
                 + ")";
-        db.execSQL(CREATE_USERS_TABLE);
-    }
+        db.execSQL(CREATE_APP_USAGE_TABLE);
 
+        // Create the AppInfo Table.
+        // We don't store AppName and Icon in AppUsage Table, because there might be multiple rows
+        // of the same app in AppUsage, and we don't want duplicate information.
+        String CREATE_APP_INFO_TABLE = "CREATE TABLE " + AppInfoSchema.TABLE_NAME + "("
+                + AppInfoSchema.COLUMN_PACKAGE + " Text PRIMARY KEY, "
+                + AppInfoSchema.COLUMN_APP_NAME + " Text, "
+                + AppInfoSchema.COLUMN_APP_ICON + " BLOB"
+                + ")";
+        db.execSQL(CREATE_APP_INFO_TABLE);
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TrackDatabaseContract.AppUsageSchema.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AppUsageSchema.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AppInfoSchema.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
@@ -71,34 +90,54 @@ public class TrackDatabase extends SQLiteOpenHelper {
     public void writeAppUsage(AppUsageEntry entry) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String tableName = TrackDatabaseContract.AppUsageSchema.TABLE_NAME;
-        String packageColumn = TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_PACKAGE;
-        String appColumn = TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_APP;
-        String timeColumn = TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_TIME;
+        // Insert app info (name and icon) if AppInfo table doesn't have this app yet.
+        ContentValues appInfoValues = new ContentValues();
+        appInfoValues.put(AppInfoSchema.COLUMN_PACKAGE, entry.PackageName);
+        appInfoValues.put(AppInfoSchema.COLUMN_APP_NAME, entry.AppName);
+        appInfoValues.put(AppInfoSchema.COLUMN_APP_ICON, entry.getIconInByteArray());
+        db.insertWithOnConflict(AppInfoSchema.TABLE_NAME, null, appInfoValues, SQLiteDatabase.CONFLICT_IGNORE);
 
-        String sqlCommand = "INSERT OR REPLACE INTO " + tableName;
-        sqlCommand += " (" + packageColumn + ", " + appColumn + ", " + timeColumn + ") VALUES ";
-        sqlCommand += "('" + entry.PackageName + "', '" + entry.AppName + "', " + entry.UsageTimeSec + ")";
+        // Insert app usage info, overwriting any existing entries.
+        ContentValues appUsageValues = new ContentValues();
+        appUsageValues.put(AppUsageSchema.COLUMN_PACKAGE, entry.PackageName);
+        appUsageValues.put(AppUsageSchema.COLUMN_USAGE_SEC, entry.UsageTimeSec);
+        appUsageValues.put(AppUsageSchema.COLUMN_DATE, entry.DaysSinceEpoch);
+        db.insertWithOnConflict(AppUsageSchema.TABLE_NAME, null, appUsageValues, SQLiteDatabase.CONFLICT_REPLACE);
 
-        db.execSQL(sqlCommand);
         db.close();
     }
 
     /**
-     * Retrieve all AppUsage information in the AppUsage table.
-     * @return A list of all AppUsage Entries stored in database.
+     * Retrieve app usage entries from database satisfying certain conditions.
+     * @param date Date of the app usage entries to retrieve, expressed in number of days
+     *             from Epoch (midnight of 1970-1-1 GMT).
+     * @return A list of app usage entries satisfying the given condition.
      */
-    public ArrayList<AppUsageEntry> getAllAppUsage() {
+    public ArrayList<AppUsageEntry> readAppUsage(long date) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Get all rows in the AppUsage table.
-        Cursor cursor = db.query(TrackDatabaseContract.AppUsageSchema.TABLE_NAME,
-                TrackDatabaseContract.AppUsageSchema.ALL_COLUMN_NAMES,
-                null, null, null, null, null, null);
+        // Use a raw query to query appInfoTable and appUsageTable at the same time.
+        String selections = " ";
+        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE + ", ";
+        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_NAME + ", ";
+        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_ICON + ", ";
+        selections += AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_USAGE_SEC + " ";
 
-        ArrayList<AppUsageEntry> entries = new ArrayList<AppUsageEntry>();
+        String tables = " " + AppInfoSchema.TABLE_NAME + ", " + AppUsageSchema.TABLE_NAME + " ";
 
-        // Store the rows in a list of AppUsageEntry, and return it.
+        String conditions = " ";
+        conditions += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE +
+                " = " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_PACKAGE;
+        conditions += " and " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE +
+                " = " + date;
+
+        String rawQuery = "SELECT" + selections + "FROM" + tables + "WHERE" + conditions;
+
+        // Query the database to get a cursor
+        Cursor cursor = db.rawQuery(rawQuery, null);
+
+        // Retrieve app usage entries from cursor and return it.
+        ArrayList <AppUsageEntry> entries = new ArrayList<AppUsageEntry>();
         if (cursor.moveToFirst()){
             int numApps = cursor.getCount();
             for (int i=0; i<numApps; i++){

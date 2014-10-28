@@ -1,6 +1,10 @@
 package edu.swarthmore.cs.moodtracker.util;
 
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by Peng on 10/19/2014.
@@ -10,12 +14,8 @@ public class AppUsageEntry {
     public String PackageName = "";
     public int UsageTimeSec = 0;
     public String AppName = "";
-
-    /**
-     * Empty Constructor.
-     */
-    public AppUsageEntry(){
-    }
+    public Bitmap AppIcon = null;
+    public long DaysSinceEpoch = 0;
 
     /**
      * Construct an AppUsageEntry using given information.
@@ -23,10 +23,12 @@ public class AppUsageEntry {
      * @param appName Name of the app.
      * @param usageTimeSec Usage time of the app in seconds.
      */
-    public AppUsageEntry(String packageName, String appName,int usageTimeSec){
+    public AppUsageEntry(String packageName, String appName, Bitmap icon, int usageTimeSec, long daysSinceEpoch){
         this.PackageName = packageName;
         this.AppName = appName;
         this.UsageTimeSec = usageTimeSec;
+        this.AppIcon = icon;
+        this.DaysSinceEpoch = daysSinceEpoch;
     }
 
     /**
@@ -42,23 +44,57 @@ public class AppUsageEntry {
         }
 
         // Get the Package Name column
-        int index = cursor.getColumnIndex(TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_PACKAGE);
+        int index = cursor.getColumnIndex(TrackContract.AppUsageSchema.COLUMN_PACKAGE);
         if (index >= 0) {
             this.PackageName = cursor.getString(index);
         }
 
         // Get the App Name column
-        index = cursor.getColumnIndex(TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_APP);
+        index = cursor.getColumnIndex(TrackContract.AppInfoSchema.COLUMN_APP_NAME);
         if (index >= 0) {
             this.AppName = cursor.getString(index);
         }
 
+        // Get the App Name column
+        index = cursor.getColumnIndex(TrackContract.AppInfoSchema.COLUMN_APP_ICON);
+        if (index >= 0) {
+            this.populateIconFromByteArray(cursor.getBlob(index));
+        }
+
         // Get the Usage Time column
-        index = cursor.getColumnIndex(TrackDatabaseContract.AppUsageSchema.COLUMN_NAME_TIME);
+        index = cursor.getColumnIndex(TrackContract.AppUsageSchema.COLUMN_USAGE_SEC);
         if (index >= 0) {
             this.UsageTimeSec = cursor.getInt(index);
         }
 
+        // Get the Date column
+        index = cursor.getColumnIndex(TrackContract.AppUsageSchema.COLUMN_DATE);
+        if (index >= 0) {
+            this.DaysSinceEpoch = cursor.getLong(index);
+        }
+
         cursor.moveToNext();
+    }
+
+    /**
+     * Converts the icon of this app usage entry to a byte array. Used in database storage.
+     * @return The encoded byte array, using PNG format (no information loss).
+     */
+    public byte[] getIconInByteArray() {
+        if (this.AppIcon == null)
+            return null;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        this.AppIcon.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    /**
+     * Populate the app icon of this entry using an encoded byte array.
+     * @param byteArray The encoded byte array to be converted to BitMap.
+     */
+    public void populateIconFromByteArray(byte[] byteArray) {
+        if (byteArray == null)
+            return;
+        this.AppIcon = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
     }
 }
