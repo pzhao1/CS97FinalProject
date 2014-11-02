@@ -11,6 +11,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +61,7 @@ public class TrackService extends Service{
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate()");
+        Toast.makeText(this, "onCreate()", Toast.LENGTH_SHORT).show();
         mDatabase = TrackDatabase.getInstance(this);
 
         // Initialize and run App Usage tracking.
@@ -70,26 +72,31 @@ public class TrackService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand()");
-
+        Toast.makeText(this, "onStartCommand()", Toast.LENGTH_SHORT).show();
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind()");
+        Toast.makeText(this, "onBind()", Toast.LENGTH_SHORT).show();
         return mBinder;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind()");
-
+        Toast.makeText(this, "onUnBind()", Toast.LENGTH_SHORT).show();
         saveDataToDatabase();
         return false;
     }
 
     @Override
     public void onDestroy() {
+        // TODO: onDestroy() is not guaranteed to be called when system decides to kill this service
+        // due to low memory. Save data periodically.
+        Toast.makeText(this, "onDestroy()", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onDestroy()");
 
         // Stop tracking app usage status.
@@ -205,6 +212,8 @@ public class TrackService extends Service{
     private void checkForNewDay() {
         long newDate = getDaysSinceEpoch();
         if (newDate > mCurrentDate) {
+            Log.d(TAG, "newDay");
+            Toast.makeText(this, "newDay", Toast.LENGTH_SHORT).show();
             saveDataToDatabase();
             mCurrentDate = newDate;
 

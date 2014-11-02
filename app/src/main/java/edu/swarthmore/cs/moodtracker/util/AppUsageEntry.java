@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
  */
 public class AppUsageEntry {
     public static final String TAG = "AppUsageEntry";
-    
+
     public String PackageName = "";
     public int UsageTimeSec = 0;
     public String AppName = "";
