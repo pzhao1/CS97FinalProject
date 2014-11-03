@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import edu.swarthmore.cs.moodtracker.util.TrackContract.AppInfoSchema;
 import edu.swarthmore.cs.moodtracker.util.TrackContract.AppUsageSchema;
+import edu.swarthmore.cs.moodtracker.util.TrackContract.SurveyInfoSchema;
 
 /**
  * Created by Peng on 10/19/2014.
@@ -71,6 +72,13 @@ public class TrackDatabase extends SQLiteOpenHelper {
                 + AppInfoSchema.COLUMN_APP_ICON + " BLOB"
                 + ")";
         db.execSQL(CREATE_APP_INFO_TABLE);
+
+        String CREATE_SURVEY_INFO_TABLE = "CREATE TABLE " + SurveyInfoSchema.TABLE_NAME + "("
+                + SurveyInfoSchema.COLUMN_SURVEY_NUMBER + " INTEGER PRIMARY KEY, "
+                + SurveyInfoSchema.COLUMN_QUESTIONS_ANSWERS + " Text"
+                + SurveyInfoSchema.COLUMN_DATE + " INTEGER, "
+                + ")";
+        db.execSQL(CREATE_SURVEY_INFO_TABLE);
     }
 
     @Override
@@ -78,6 +86,7 @@ public class TrackDatabase extends SQLiteOpenHelper {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + AppUsageSchema.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AppInfoSchema.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + SurveyInfoSchema.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
