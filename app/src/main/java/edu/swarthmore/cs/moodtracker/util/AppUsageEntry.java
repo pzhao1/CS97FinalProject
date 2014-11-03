@@ -19,6 +19,7 @@ public class AppUsageEntry {
     public String AppName = "";
     public Bitmap AppIcon = null;
     public long DaysSinceEpoch = 0;
+    public boolean Dirty = false;
 
     /**
      * Construct an AppUsageEntry using given information.

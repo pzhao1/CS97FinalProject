@@ -3,11 +3,15 @@ package edu.swarthmore.cs.moodtracker;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -37,16 +41,27 @@ public class TrackService extends Service{
     // Database that stores all tracking information
     private TrackDatabase mDatabase;
 
-    /* Variables for tracking App Usage info */
+    /* Timer and Date Variables  */
+    private Handler mTimer = new Handler();
+    private Runnable mTimerCallback = null;
+    private final int mTimerInterval = 1000;
+    private final int mSaveInterval = 60;
+    private int mSaveTicks = 0;
+    private TimeZone mMyTimeZone = TimeZone.getDefault();
+    private long mCurrentDate = getDaysSinceEpoch();
+
+    /* App Usage Tracking Variables */
     private ActivityManager mActivityManager = null;
     private PackageManager mPackageManager = null;
     private HashSet<String> mFilteredSystemPackagesSet = null;
     private HashMap<String, AppUsageEntry> mAppUsageInfo;
-    private int mInterval = 1000;
-    private Handler mAppUsageTimer = new Handler();
-    private Runnable mAppUsageUpdateCallback = null;
-    private TimeZone mMyTimeZone = TimeZone.getDefault();
-    private long mCurrentDate = 0;  // Current date represented by days since epoch.
+
+
+
+    /*----------------------------*/
+    /* Service Fields and Methods */
+    /*----------------------------*/
+
     /**
      * Class used for the client Binder.  We can safely return the service itself because
      * we know this service is only going to be used by our application.
@@ -66,13 +81,13 @@ public class TrackService extends Service{
 
         // Initialize and run App Usage tracking.
         initializeAppUsageTracking();
-        mAppUsageUpdateCallback.run();
+        initializeTimer();
+        mTimerCallback.run();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand()");
-        Toast.makeText(this, "onStartCommand()", Toast.LENGTH_SHORT).show();
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
@@ -80,31 +95,114 @@ public class TrackService extends Service{
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind()");
-        Toast.makeText(this, "onBind()", Toast.LENGTH_SHORT).show();
         return mBinder;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind()");
-        Toast.makeText(this, "onUnBind()", Toast.LENGTH_SHORT).show();
-        saveDataToDatabase();
         return false;
     }
 
     @Override
     public void onDestroy() {
-        // TODO: onDestroy() is not guaranteed to be called when system decides to kill this service
-        // due to low memory. Save data periodically.
         Toast.makeText(this, "onDestroy()", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onDestroy()");
 
         // Stop tracking app usage status.
-        mAppUsageTimer.removeCallbacks(mAppUsageUpdateCallback);
+        mTimer.removeCallbacks(mTimerCallback);
 
         saveDataToDatabase();
     }
 
+
+    /*---------------------------------*/
+    /* Timer and general timed Methods */
+    /*---------------------------------*/
+
+    /**
+     * Set up the timer interval and callbacks.
+     */
+    private void initializeTimer() {
+        // Start the call back that updates app usage data every mTimerInterval ms.
+        mTimerCallback = new Runnable() {
+            @Override
+            public void run() {
+                checkForNewDay();
+                updateAppUsageInfo();
+
+                // Save data to database every mSaveInterval seconds.
+                mSaveTicks += (mTimerInterval /1000);
+                if (mSaveTicks > mSaveInterval) {
+                    saveDataToDatabase();
+                }
+
+                // Post this runnable again for next tick.
+                mTimer.postDelayed(this, mTimerInterval);
+            }
+        };
+    }
+
+    /**
+     * Check whether we just passed 11:59:59 pm. If yes, save yesterday's data to database
+     * and initialize today's data.
+     */
+    private void checkForNewDay() {
+        long newDate = getDaysSinceEpoch();
+        if (newDate > mCurrentDate) {
+            Log.d(TAG, "newDay");
+            Toast.makeText(this, "newDay", Toast.LENGTH_SHORT).show();
+            saveDataToDatabase();
+            mCurrentDate = newDate;
+
+            // Load today's usage data from database.
+            readDataFromDatabase(mCurrentDate);
+        }
+    }
+
+    /**
+     * Get the number of days passed since Epoch (1970/1/1). This is the date formate stored in database.
+     * @return a long representing the number of days since epoch.
+     */
+    private long getDaysSinceEpoch() {
+        long offset = mMyTimeZone.getOffset(System.currentTimeMillis());
+        long millis = System.currentTimeMillis() + offset;
+        return millis / (24*3600*1000);
+    }
+
+    /**
+     * Write app usage data to database (i.e. disk) to store them permanently.
+     * Called in onUnbind() and onDestroy().
+     */
+    public void saveDataToDatabase() {
+        Log.d(TAG, "Saving app usage to database");
+        Toast.makeText(this, "saving usage", Toast.LENGTH_SHORT).show();
+        for (AppUsageEntry entry : mAppUsageInfo.values()) {
+            if (entry.Dirty) {
+                mDatabase.writeAppUsage(entry);
+                entry.Dirty = false;
+            }
+        }
+        mSaveTicks = 0;
+    }
+
+
+    /**
+     * Load app usage data from database.
+     * @param date The date of usage data we are interested in.
+     */
+    private void readDataFromDatabase(long date) {
+        Log.d(TAG, "Loading app usage from database");
+        mAppUsageInfo = new HashMap<String, AppUsageEntry>();
+        ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(date);
+        for (AppUsageEntry entry:existingEntries) {
+            mAppUsageInfo.put(entry.PackageName, entry);
+        }
+    }
+
+    /*----------------------------*/
+    /* App Usage Specific Methods */
+    /*----------------------------*/
 
     /**
      * Get the current app usage info. Used by the activities bound to this service.
@@ -113,6 +211,7 @@ public class TrackService extends Service{
     public List<AppUsageEntry> getCurrentAppUsageInfo() {
         return new ArrayList<AppUsageEntry>(mAppUsageInfo.values());
     }
+
 
     /**
      * Initialize App Usage tracking.
@@ -129,35 +228,16 @@ public class TrackService extends Service{
             mFilteredSystemPackagesSet.add(packageName);
         }
 
-        // Set the current date (represented by days since epoch)
-        mCurrentDate = getDaysSinceEpoch();
-
-        // Initialize the app usage hashmap. Load today's usage data from database.
-        // TODO: combine duplicate code.
-        mAppUsageInfo = new HashMap<String, AppUsageEntry>();
-        ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(mCurrentDate);
-        for (AppUsageEntry entry:existingEntries) {
-            mAppUsageInfo.put(entry.PackageName, entry);
-        }
-
-        // Start the call back that updates app usage data every mInterval ms.
-        mAppUsageUpdateCallback = new Runnable() {
-            @Override
-            public void run() {
-                updateAppUsageInfo();
-                mAppUsageTimer.postDelayed(this, mInterval);
-            }
-        };
+        // Initialize the app usage Hashmap. Load today's usage data from database.
+        readDataFromDatabase(mCurrentDate);
     }
+
 
     /**
      * Update the App Usage track information.
-     * Called by mAppUsageTimer every [mInterval] milliseconds.
+     * Called by mTimer every [mTimerInterval] milliseconds.
      */
     private void updateAppUsageInfo() {
-
-        checkForNewDay();
-
         List<RunningAppProcessInfo> appProcesses = mActivityManager.getRunningAppProcesses();
         for(RunningAppProcessInfo appProcessInfo : appProcesses){
             // Skip non-foreground processes.
@@ -189,13 +269,16 @@ public class TrackService extends Service{
             // We have found a foreground app that's not system process.
             // It's probably the app user is using right now. Add it to the app usage info.
             if ( mAppUsageInfo.containsKey(packageName) ) {
-                mAppUsageInfo.get(packageName).UsageTimeSec += 1;
+                AppUsageEntry entry = mAppUsageInfo.get(packageName);
+                entry.UsageTimeSec += (mTimerInterval /1000);
+                entry.Dirty = true;
             }
             else {
                 String appName = packageInfo.applicationInfo.loadLabel(mPackageManager).toString();
                 BitmapDrawable appIcon = (BitmapDrawable) packageInfo.applicationInfo.loadIcon(getPackageManager());
 
                 AppUsageEntry newEntry = new AppUsageEntry(packageName, appName, appIcon.getBitmap(), 1, mCurrentDate);
+                newEntry.Dirty = true;
                 mAppUsageInfo.put(packageName, newEntry);
             }
 
@@ -204,28 +287,6 @@ public class TrackService extends Service{
         }
     }
 
-
-    /**
-     * Check whether we just passed 11:59:59 pm. If yes, save yesterday's data to database
-     * and initialize today's data.
-     */
-    private void checkForNewDay() {
-        long newDate = getDaysSinceEpoch();
-        if (newDate > mCurrentDate) {
-            Log.d(TAG, "newDay");
-            Toast.makeText(this, "newDay", Toast.LENGTH_SHORT).show();
-            saveDataToDatabase();
-            mCurrentDate = newDate;
-
-            // Initialize the app usage hashmap. Load today's usage data from database.
-            // TODO: combine duplicate code.
-            mAppUsageInfo = new HashMap<String, AppUsageEntry>();
-            ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(mCurrentDate);
-            for (AppUsageEntry entry:existingEntries) {
-                mAppUsageInfo.put(entry.PackageName, entry);
-            }
-        }
-    }
 
     /**
      * Decide whether this app process is a provider or service.
@@ -251,20 +312,46 @@ public class TrackService extends Service{
     }
 
 
-    /**
-     * Write the tracked app usage info back to database (i.e. disk) to store them permanently.
-     * Called in onUnbind() and onDestroy().
-     */
-    private void saveDataToDatabase() {
-        Log.d(TAG, "Saving data to database");
-        for (AppUsageEntry entry : mAppUsageInfo.values()) {
-            mDatabase.writeAppUsage(entry);
+    /*--------------------------------------*/
+    /* Broadcast Receiver for Screen ON/OFF */
+    /*--------------------------------------*/
+    private BroadcastReceiver mPowerKeyReceiver = null;
+
+    private void registBroadcastReceiver() {
+        final IntentFilter theFilter = new IntentFilter();
+        /** System Defined Broadcast */
+        theFilter.addAction(Intent.ACTION_SCREEN_ON);
+        theFilter.addAction(Intent.ACTION_SCREEN_OFF);
+
+        mPowerKeyReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String strAction = intent.getAction();
+
+                if (strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON)) {
+                    // > Your playground~!
+                }
+            }
+        };
+
+        getApplicationContext().registerReceiver(mPowerKeyReceiver, theFilter);
+    }
+
+    private void unregisterReceiver() {
+        int apiLevel = Build.VERSION.SDK_INT;
+
+        if (apiLevel >= 7) {
+            try {
+                getApplicationContext().unregisterReceiver(mPowerKeyReceiver);
+            }
+            catch (IllegalArgumentException e) {
+                mPowerKeyReceiver = null;
+            }
+        }
+        else {
+            getApplicationContext().unregisterReceiver(mPowerKeyReceiver);
+            mPowerKeyReceiver = null;
         }
     }
 
-    private long getDaysSinceEpoch() {
-        long offset = mMyTimeZone.getOffset(System.currentTimeMillis());
-        long millis = System.currentTimeMillis() + offset;
-        return millis / (24*3600*1000);
-    }
 }

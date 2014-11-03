@@ -4,8 +4,12 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +25,9 @@ public class MainActivity extends Activity
     // Current title of the action bar. Changes as we select different items of the navigation drawer.
     private CharSequence mTitle;
 
+    // Connection to TrackService
+    private TrackService mService;
+    private ServiceConnection mServiceConnection = new TrackServiceConnection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,18 +36,15 @@ public class MainActivity extends Activity
         // Start and bind to the TrackService
         Intent intent = new Intent(this, TrackService.class);
         startService(intent);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
         setContentView(R.layout.activity_main);
 
-        // Construct the Fragment that displays navigation drawer.
+        // Set up the drawer.
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
-
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
 
@@ -54,7 +58,7 @@ public class MainActivity extends Activity
             case 0:
                 AppUsageSectionFragment usageFragment = new AppUsageSectionFragment();
                 mTitle = getString(R.string.title_section1);
-                fragment = (Fragment) usageFragment;
+                fragment = usageFragment;
                 break;
             case 1:
                 fragment = new TextSectionFragment();
@@ -66,9 +70,8 @@ public class MainActivity extends Activity
                 break;
         }
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
+        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        updateServiceStatusForCurrentSection(fragment);
     }
 
     public void restoreActionBar() {
@@ -105,7 +108,63 @@ public class MainActivity extends Activity
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mService.saveDataToDatabase();
+    }
+
+    @Override
     protected void onDestroy(){
         super.onDestroy();
+        unbindService(mServiceConnection);
+    }
+
+    /**
+     * Update service connection status to the fragment of current section in navigation drawer
+     * Called whenever the fragment changes or the service status changes.
+     * @param givenFragment If fragment changes, the new fragment. If service status changes, null.
+     */
+    private void updateServiceStatusForCurrentSection(Fragment givenFragment) {
+        Fragment currentFragment;
+        if (givenFragment != null)
+            currentFragment = givenFragment;
+        else {
+            // Notice: If the fragment changes by fragmentManager.beginTransaction(), then need to pass
+            // in the new fragment through givenFragment, otherwise the following line
+            // will most likely find the old fragment, because of the delay in transaction.
+            currentFragment = getFragmentManager().findFragmentById(R.id.container);
+        }
+
+        if (currentFragment instanceof AppUsageSectionFragment) {
+            if (mService != null)
+                ((AppUsageSectionFragment)currentFragment).setService(mService);
+            else
+                ((AppUsageSectionFragment)currentFragment).unSetService();
+        }
+
+        // TODO: Do something for other sections if needed.
+    }
+
+    /**
+     * The ServiceConnection class used by this activity.
+     * Handles the relationship between TrackService and different fragments.
+     */
+    private class TrackServiceConnection implements ServiceConnection {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            TrackService.TrackBinder binder = (TrackService.TrackBinder) iBinder;
+            mService = binder.getService();
+
+            // Deliver service to fragment.
+            updateServiceStatusForCurrentSection(null);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mService = null;
+
+            // Tell the fragments TrackService has disconnected.
+            updateServiceStatusForCurrentSection(null);
+        }
     }
 }

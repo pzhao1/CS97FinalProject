@@ -5,12 +5,7 @@ package edu.swarthmore.cs.moodtracker;
  */
 
 import android.app.Fragment;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +24,9 @@ public class AppUsageSectionFragment extends Fragment {
 
     public static final String TAG = "AppUsageSectionFragment";
 
-    private TrackService mService = null;
     private ListView mAppUsageListView = null;
     private View mWaitingView = null;
+    private TrackService mService = null;
 
     /**
      * Default constructor.
@@ -40,46 +35,54 @@ public class AppUsageSectionFragment extends Fragment {
         super();
     }
 
-    // Connection to TrackService
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            TrackService.TrackBinder binder = (TrackService.TrackBinder) iBinder;
-            mService = binder.getService();
-            updateViewWithService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mService = null;
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_section_app_usage, container, false);
+
         mAppUsageListView = (ListView) rootView.findViewById(R.id.list_app_usage);
         mWaitingView = rootView.findViewById(R.id.waiting_view);
+        syncLayoutWithService();
 
-        // Connect to the TrackService instance.
         // Before we get connected, just display a waiting spinner. See fragment_section_app_usage.xml
-        Intent intent = new Intent(getActivity(), TrackService.class);
-        getActivity().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-
         return rootView;
     }
 
     /**
-     * Update the fragment layout when we connect to TrackService. Requires mService != null.
+     * When MainActivity connects to the service, call this function to deliver service instance.
      */
-    private void updateViewWithService() {
-        // Hide the waiting view (progress bar and text).
-        mWaitingView.setVisibility(View.GONE);
+    public void setService(TrackService service) {
+        mService = service;
+        syncLayoutWithService();
+    }
 
-        // Display the app usage list.
-        mAppUsageListView.setVisibility(View.VISIBLE);
-        updateAppUsageList();
+    /**
+     * When MainActivity disconnects to the service, call this function to update status.
+     */
+    public void unSetService() {
+        mService = null;
+        syncLayoutWithService();
+    }
+
+    /**
+     * Update layout based on the current service status.
+     * If we are connected to service, hide the waiting section and display usage list.
+     * If we are disconnected to service, hide the usage list and display waiting section.
+     */
+    private void syncLayoutWithService() {
+        if (mWaitingView == null || mAppUsageListView == null)
+            return;
+
+        if (mService != null) {
+            mWaitingView.setVisibility(View.GONE);
+            mAppUsageListView.setVisibility(View.VISIBLE);
+            updateAppUsageList();
+        }
+        else {
+            mWaitingView.setVisibility(View.VISIBLE);
+            mAppUsageListView.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -104,15 +107,7 @@ public class AppUsageSectionFragment extends Fragment {
         super.onResume();
 
         // If we are already connected to the service, update the list.
-        if (mService != null) {
+        if (mService != null)
             updateAppUsageList();
-        }
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getActivity().unbindService(mServiceConnection);
     }
 }
