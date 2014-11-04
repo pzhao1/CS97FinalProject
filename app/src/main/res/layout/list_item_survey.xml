@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/background_frame">
+
+    <TextView
+        style="@style/CardRowTextSelector"
+        android:id="@android:id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.etsy.android.iconsy.views.IconView
+        android:id="@+id/checkmark"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_width="@dimen/text_medium"
+        android:layout_height="@dimen/text_medium"
+        android:layout_marginRight="@dimen/margin_medium_large"
+        app:iconChar="@id/ic_etsy_check"
+        app:color="@color/blue" />
+</RelativeLayout>
