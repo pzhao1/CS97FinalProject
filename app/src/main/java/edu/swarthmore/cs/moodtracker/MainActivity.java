@@ -64,7 +64,7 @@ public class MainActivity extends Activity
         mCalendar2.set(Calendar.AM_PM, Calendar.PM);
         Calendar mCalendar3 = Calendar.getInstance();
         mCalendar3.set(Calendar.HOUR_OF_DAY, 10); //add more here
-        mCalendar3.set(Calendar.MINUTE, 41);
+        mCalendar3.set(Calendar.MINUTE, 00);
         mCalendar3.set(Calendar.SECOND, 00);
         mCalendar3.set(Calendar.AM_PM, Calendar.PM);
 
