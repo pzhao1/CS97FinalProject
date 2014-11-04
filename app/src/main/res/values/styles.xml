@@ -5,4 +5,26 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="TextSurveyItem">
+        <item name="android:textColor">@color/text_dark_grey</item>
+        <item name="android:textSize">@dimen/text_survey</item>
+    </style>
+
+    <style name="SurveySelector" parent="TextSurveyItem">
+        <item name="android:padding">@dimen/survey_text_padding</item>
+    </style>
+
+    <style name="SurveyHeaderWhiteText">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SurveyQuestionHeader" parent="SurveyHeaderWhiteText">
+        <item name="android:textSize">@dimen/survey_heading_text</item>
+    </style>
+
+    <style name="SurveyQuestionSubHeader" parent="SurveyHeaderWhiteText">
+        <item name="android:textSize">@dimen/survey_heading_subtext</item>
+    </style>
+
 </resources>

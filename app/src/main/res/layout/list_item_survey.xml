@@ -3,22 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/background_frame">
+    android:id="@+id/background_frame"
+    android:background="@android:color/white">
 
     <TextView
-        style="@style/CardRowTextSelector"
+        style="@style/SurveySelector"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
         android:id="@android:id/text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.etsy.android.iconsy.views.IconView
+    <ImageView
         android:id="@+id/checkmark"
-        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:scaleType="fitCenter"
+        android:scaleY=".5"
+        android:scaleX=".5"
         android:layout_centerVertical="true"
-        android:layout_width="@dimen/text_medium"
-        android:layout_height="@dimen/text_medium"
-        android:layout_marginRight="@dimen/margin_medium_large"
-        app:iconChar="@id/ic_etsy_check"
-        app:color="@color/blue" />
+        android:src="@drawable/survey_checkmark"
+        android:layout_marginRight="@dimen/margin_checkmark"
+    />
+
 </RelativeLayout>
