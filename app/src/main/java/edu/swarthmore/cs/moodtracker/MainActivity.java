@@ -2,8 +2,10 @@ package edu.swarthmore.cs.moodtracker;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,8 @@ import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.util.Calendar;
 
 
 public class MainActivity extends Activity
@@ -27,6 +31,8 @@ public class MainActivity extends Activity
     // Connection to TrackService
     private TrackService mService;
     private ServiceConnection mServiceConnection = new TrackServiceConnection();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,31 @@ public class MainActivity extends Activity
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        // Set alarm for survey
+        Calendar mCalendar1 = Calendar.getInstance();
+        mCalendar1.set(Calendar.HOUR_OF_DAY, 9); //add more here
+        mCalendar1.set(Calendar.MINUTE, 0);
+        mCalendar1.set(Calendar.SECOND, 0);
+        mCalendar1.set(Calendar.AM_PM, 1);
+        Calendar mCalendar2 = Calendar.getInstance();
+        mCalendar2.set(Calendar.HOUR_OF_DAY, 3); //add more here
+        mCalendar2.set(Calendar.MINUTE, 0);
+        mCalendar2.set(Calendar.SECOND, 0);
+        mCalendar2.set(Calendar.AM_PM, 0);
+        Calendar mCalendar3 = Calendar.getInstance();
+        mCalendar3.set(Calendar.HOUR_OF_DAY, 10); //add more here
+        mCalendar3.set(Calendar.MINUTE, 0);
+        mCalendar3.set(Calendar.SECOND, 0);
+        mCalendar3.set(Calendar.AM_PM, 0);
+
+        Intent myIntent = new Intent(this, NotificationReceiver.class);
+        PendingIntent mPendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
+
+        AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar1.getTimeInMillis(),mAlarmManager.INTERVAL_DAY, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar2.getTimeInMillis(),mAlarmManager.INTERVAL_DAY, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar3.getTimeInMillis(),mAlarmManager.INTERVAL_DAY, mPendingIntent);
     }
 
 
