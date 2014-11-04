@@ -122,7 +122,7 @@ public class TrackDatabase extends SQLiteOpenHelper {
      *             from Epoch (midnight of 1970-1-1 GMT).
      * @return A list of app usage entries satisfying the given condition.
      */
-    public ArrayList<AppUsageEntry> readAppUsage(long date) {
+    public ArrayList<AppUsageEntry> readAppUsage(long startDate, long endDate) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Use a raw query to query appInfoTable and appUsageTable at the same time.
@@ -130,17 +130,23 @@ public class TrackDatabase extends SQLiteOpenHelper {
         selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE + ", ";
         selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_NAME + ", ";
         selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_ICON + ", ";
-        selections += AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_USAGE_SEC + ", ";
+        selections += "SUM(" + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_USAGE_SEC + ")" +
+                " AS " + AppUsageSchema.COLUMN_USAGE_SEC + ", ";
         selections += AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " ";
+
         String tables = " " + AppInfoSchema.TABLE_NAME + ", " + AppUsageSchema.TABLE_NAME + " ";
 
         String conditions = " ";
         conditions += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE +
                 " = " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_PACKAGE;
-        conditions += " and " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE +
-                " = " + date;
+        if (startDate > 0)
+            conditions += " AND " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " >= " + startDate;
+        if (endDate > 0)
+            conditions += " AND " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " <= " + endDate + " ";
 
-        String rawQuery = "SELECT" + selections + "FROM" + tables + "WHERE" + conditions;
+        String groupBy =  " " + AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE + " ";
+
+        String rawQuery = "SELECT" + selections + "FROM" + tables + "WHERE" + conditions + "GROUP BY" + groupBy;
 
         // Query the database to get a cursor
         Cursor cursor = db.rawQuery(rawQuery, null);

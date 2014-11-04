@@ -19,10 +19,9 @@ public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 
-    // Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+    // Navigation Drawer
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
-    // Current title of the action bar. Changes as we select different items of the navigation drawer.
+    private Fragment mCurrentSectionFragment;
     private CharSequence mTitle;
 
     // Connection to TrackService
@@ -52,26 +51,26 @@ public class MainActivity extends Activity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment = null;
 
         switch (position) {
             case 0:
                 AppUsageSectionFragment usageFragment = new AppUsageSectionFragment();
+                if (mService != null)
+                    usageFragment.setService(mService);
                 mTitle = getString(R.string.title_section1);
-                fragment = usageFragment;
+                mCurrentSectionFragment = usageFragment;
                 break;
             case 1:
-                fragment = new TextSectionFragment();
+                mCurrentSectionFragment = new TextSectionFragment();
                 mTitle = getString(R.string.title_section2);
                 break;
             case 2:
-                fragment = new SurveySectionFragment();
+                mCurrentSectionFragment = new SurveySectionFragment();
                 mTitle = getString(R.string.title_section3);
                 break;
         }
 
-        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
-        updateServiceStatusForCurrentSection(fragment);
+        fragmentManager.beginTransaction().replace(R.id.container, mCurrentSectionFragment).commit();
     }
 
     public void restoreActionBar() {
@@ -110,7 +109,8 @@ public class MainActivity extends Activity
     @Override
     protected void onPause() {
         super.onPause();
-        mService.saveDataToDatabase();
+        if (mService != null)
+            mService.saveDataToDatabase();
     }
 
     @Override
@@ -119,31 +119,6 @@ public class MainActivity extends Activity
         unbindService(mServiceConnection);
     }
 
-    /**
-     * Update service connection status to the fragment of current section in navigation drawer
-     * Called whenever the fragment changes or the service status changes.
-     * @param givenFragment If fragment changes, the new fragment. If service status changes, null.
-     */
-    private void updateServiceStatusForCurrentSection(Fragment givenFragment) {
-        Fragment currentFragment;
-        if (givenFragment != null)
-            currentFragment = givenFragment;
-        else {
-            // Notice: If the fragment changes by fragmentManager.beginTransaction(), then need to pass
-            // in the new fragment through givenFragment, otherwise the following line
-            // will most likely find the old fragment, because of the delay in transaction.
-            currentFragment = getFragmentManager().findFragmentById(R.id.container);
-        }
-
-        if (currentFragment instanceof AppUsageSectionFragment) {
-            if (mService != null)
-                ((AppUsageSectionFragment)currentFragment).setService(mService);
-            else
-                ((AppUsageSectionFragment)currentFragment).unSetService();
-        }
-
-        // TODO: Do something for other sections if needed.
-    }
 
     /**
      * The ServiceConnection class used by this activity.
@@ -156,7 +131,8 @@ public class MainActivity extends Activity
             mService = binder.getService();
 
             // Deliver service to fragment.
-            updateServiceStatusForCurrentSection(null);
+            if (mCurrentSectionFragment instanceof AppUsageSectionFragment)
+                ((AppUsageSectionFragment) mCurrentSectionFragment).setService(mService);
         }
 
         @Override
@@ -164,7 +140,9 @@ public class MainActivity extends Activity
             mService = null;
 
             // Tell the fragments TrackService has disconnected.
-            updateServiceStatusForCurrentSection(null);
+            // Deliver service to fragment.
+            if (mCurrentSectionFragment instanceof AppUsageSectionFragment)
+                ((AppUsageSectionFragment) mCurrentSectionFragment).unsetService();
         }
     }
 }

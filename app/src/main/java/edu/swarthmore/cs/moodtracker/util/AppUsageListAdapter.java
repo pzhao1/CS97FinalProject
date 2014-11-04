@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Date;
 import java.util.List;
 
 import edu.swarthmore.cs.moodtracker.R;
@@ -29,7 +30,7 @@ public class AppUsageListAdapter extends ArrayAdapter<AppUsageEntry> {;
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
+        Date d = new Date();
         View v = convertView;
         if (v == null) {
             LayoutInflater vi;
@@ -45,9 +46,18 @@ public class AppUsageListAdapter extends ArrayAdapter<AppUsageEntry> {;
             ImageView iconImage = (ImageView) v.findViewById(R.id.list_field_app_icon);
 
             appNameText.setText(entry.AppName);
-            timeText.setText(String.valueOf(entry.UsageTimeSec));
+            timeText.setText(secToHourMinuteSecond(entry.UsageTimeSec));
             iconImage.setImageDrawable(new BitmapDrawable(mContext.getResources(), entry.AppIcon));
         }
         return v;
     }
+
+    private String secToHourMinuteSecond(int numSeconds) {
+        int seconds = (numSeconds % 60);
+        int minutes = ((numSeconds / 60) % 60);
+        int hours = (numSeconds / 3600);
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+
 }

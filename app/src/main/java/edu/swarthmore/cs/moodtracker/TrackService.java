@@ -11,7 +11,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -76,12 +75,12 @@ public class TrackService extends Service{
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate()");
-        Toast.makeText(this, "onCreate()", Toast.LENGTH_SHORT).show();
         mDatabase = TrackDatabase.getInstance(this);
 
         // Initialize and run App Usage tracking.
         initializeAppUsageTracking();
         initializeTimer();
+        registerBroadcastReceiver();
         mTimerCallback.run();
     }
 
@@ -109,16 +108,18 @@ public class TrackService extends Service{
         Toast.makeText(this, "onDestroy()", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onDestroy()");
 
-        // Stop tracking app usage status.
+        // Stop timer ticking.
         mTimer.removeCallbacks(mTimerCallback);
 
+        // Clean up.
+        unregisterBroadcastReceiver();
         saveDataToDatabase();
     }
 
 
-    /*---------------------------------*/
-    /* Timer and general timed Methods */
-    /*---------------------------------*/
+    /*-----------------------*/
+    /* Time and Date Methods */
+    /*-----------------------*/
 
     /**
      * Set up the timer interval and callbacks.
@@ -156,7 +157,7 @@ public class TrackService extends Service{
             mCurrentDate = newDate;
 
             // Load today's usage data from database.
-            readDataFromDatabase(mCurrentDate);
+            readDataFromDatabase();
         }
     }
 
@@ -176,7 +177,6 @@ public class TrackService extends Service{
      */
     public void saveDataToDatabase() {
         Log.d(TAG, "Saving app usage to database");
-        Toast.makeText(this, "saving usage", Toast.LENGTH_SHORT).show();
         for (AppUsageEntry entry : mAppUsageInfo.values()) {
             if (entry.Dirty) {
                 mDatabase.writeAppUsage(entry);
@@ -188,13 +188,12 @@ public class TrackService extends Service{
 
 
     /**
-     * Load app usage data from database.
-     * @param date The date of usage data we are interested in.
+     * Load data from TrackDatabase and update member variables.
      */
-    private void readDataFromDatabase(long date) {
+    private void readDataFromDatabase() {
         Log.d(TAG, "Loading app usage from database");
         mAppUsageInfo = new HashMap<String, AppUsageEntry>();
-        ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(date);
+        ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(mCurrentDate, mCurrentDate);
         for (AppUsageEntry entry:existingEntries) {
             mAppUsageInfo.put(entry.PackageName, entry);
         }
@@ -206,10 +205,14 @@ public class TrackService extends Service{
 
     /**
      * Get the current app usage info. Used by the activities bound to this service.
+     * This involves database query and is best
      * @return A collection of AppUsageEntry objects.
      */
-    public List<AppUsageEntry> getCurrentAppUsageInfo() {
-        return new ArrayList<AppUsageEntry>(mAppUsageInfo.values());
+    public List<AppUsageEntry> getAppUsageInfo(int dateRange) {
+        if (dateRange < 0)
+            return mDatabase.readAppUsage(-1, mCurrentDate);
+        else
+            return mDatabase.readAppUsage(mCurrentDate-dateRange, mCurrentDate);
     }
 
 
@@ -229,7 +232,7 @@ public class TrackService extends Service{
         }
 
         // Initialize the app usage Hashmap. Load today's usage data from database.
-        readDataFromDatabase(mCurrentDate);
+        readDataFromDatabase();
     }
 
 
@@ -315,42 +318,49 @@ public class TrackService extends Service{
     /*--------------------------------------*/
     /* Broadcast Receiver for Screen ON/OFF */
     /*--------------------------------------*/
-    private BroadcastReceiver mPowerKeyReceiver = null;
+    private BroadcastReceiver mScreenOnOffReceiver = new TrackBroadcastReceiver();
 
-    private void registBroadcastReceiver() {
-        final IntentFilter theFilter = new IntentFilter();
-        /** System Defined Broadcast */
-        theFilter.addAction(Intent.ACTION_SCREEN_ON);
-        theFilter.addAction(Intent.ACTION_SCREEN_OFF);
-
-        mPowerKeyReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String strAction = intent.getAction();
-
-                if (strAction.equals(Intent.ACTION_SCREEN_OFF) || strAction.equals(Intent.ACTION_SCREEN_ON)) {
-                    // > Your playground~!
-                }
+    /**
+     * Our broadcast receiver that listens to system events we are interested in.
+     */
+    private class TrackBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_SCREEN_OFF)) {
+                Log.d(TAG, "Screen off, stop ticking timer");
+                mTimer.removeCallbacks(mTimerCallback);
             }
-        };
 
-        getApplicationContext().registerReceiver(mPowerKeyReceiver, theFilter);
-    }
-
-    private void unregisterReceiver() {
-        int apiLevel = Build.VERSION.SDK_INT;
-
-        if (apiLevel >= 7) {
-            try {
-                getApplicationContext().unregisterReceiver(mPowerKeyReceiver);
-            }
-            catch (IllegalArgumentException e) {
-                mPowerKeyReceiver = null;
+            if (action.equals(Intent.ACTION_SCREEN_ON)) {
+                Log.d(TAG, "Screen on, start ticking timer");
+                mTimerCallback.run();
             }
         }
-        else {
-            getApplicationContext().unregisterReceiver(mPowerKeyReceiver);
-            mPowerKeyReceiver = null;
+    }
+
+    /**
+     * Register our broadcast receiver, meaning we start listening to system broadcasts.
+     */
+    private void registerBroadcastReceiver() {
+
+        // Only receive Screen On/Off broadcasts.
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+
+        getApplicationContext().registerReceiver(mScreenOnOffReceiver, filter);
+    }
+
+    /**
+     * Unregister our broadcast receiver, meaning we stop listening to system broadcasts.
+     */
+    private void unregisterBroadcastReceiver() {
+        try {
+            getApplicationContext().unregisterReceiver(mScreenOnOffReceiver);
+        }
+        catch (IllegalArgumentException e) {
+            mScreenOnOffReceiver = null;
         }
     }
 

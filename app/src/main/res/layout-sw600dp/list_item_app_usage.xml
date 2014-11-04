@@ -3,14 +3,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="40dp">
+    android:layout_height="60dp">
 
     <ImageView
         android:id="@+id/list_field_app_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_weight="0"
-        android:padding="5dp"
+        android:padding="10dp"
         />
 
     <TextView
@@ -19,9 +19,9 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:textSize="20sp"
-        android:paddingStart="5dp"
+        android:paddingStart="10dp"
         android:paddingEnd="0dp"
-        android:paddingLeft="5dp"
+        android:paddingLeft="10dp"
         android:paddingRight="0dp"
         android:gravity="center_vertical"
         android:ellipsize="end"
@@ -34,9 +34,9 @@
         android:layout_weight="0"
         android:textSize="20sp"
         android:gravity="center_vertical"
-        android:paddingEnd="5dp"
+        android:paddingEnd="10dp"
         android:paddingStart="0dp"
-        android:paddingRight="5dp"
+        android:paddingRight="10dp"
         android:paddingLeft="0dp" />
 
 </LinearLayout>

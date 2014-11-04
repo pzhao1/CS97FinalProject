@@ -9,7 +9,16 @@
 
     <!-- Dimensions for app usage section -->
     <dimen name="app_usage_list_item_height">40dp</dimen>
-    <dimen name="app_usage_list_name_indentation">10dp</dimen>
-    <dimen name="app_usage_list_name_fontsize">20sp</dimen>
-    <dimen name="app_usage_list_time_fontsize">20sp</dimen>
+    <dimen name="app_usage_list_name_padding">10dp</dimen>
+    <dimen name="app_usage_list_time_padding">10dp</dimen>
+
+    <dimen name="app_usage_portrait_filter_panel_height">140dp</dimen>
+    <dimen name="app_usage_land_filter_panel_width">190dp</dimen>
+    <dimen name="app_usage_filter_title_height">30dp</dimen>
+    <dimen name="app_usage_filter_item_height">55dp</dimen>
+    <dimen name="app_usage_filter_padding_horizontal">5dp</dimen>
+    <dimen name="app_usage_filter_padding_bottom">10dp</dimen>
+    <dimen name="app_usage_title_font_size">25sp</dimen>
+    <dimen name="app_usage_normal_font_size">20sp</dimen>
+    <dimen name="app_usage_small_font_size">15sp</dimen>
 </resources>
