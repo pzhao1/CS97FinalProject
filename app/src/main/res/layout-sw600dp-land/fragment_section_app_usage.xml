@@ -26,18 +26,16 @@
         android:id="@+id/app_usage_content_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:baselineAligned="false" >
+        android:orientation="horizontal" >
 
         <ListView
             android:id="@+id/app_usage_list"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fadeScrollbars="false" />
+            android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="240dp"
+            android:layout_width="@dimen/app_usage_filter_panel_width_land_sw600dp"
             android:layout_height="match_parent"
             android:layout_weight="0"
             android:orientation="vertical"
@@ -45,9 +43,9 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="@dimen/app_usage_filter_title_height_sw600dp"
                 android:textStyle="bold"
-                android:textSize="20sp"
+                android:textSize="@dimen/app_usage_normal_font_size"
                 android:text="@string/app_usage_filter_title"
                 android:gravity="center"/>
 
@@ -55,16 +53,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="0dp"
-                android:paddingBottom="20dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingBottom="@dimen/app_usage_filter_padding_bottom_sw600dp"
+                android:paddingLeft="@dimen/app_usage_filter_padding_horizontal_sw600dp"
+                android:paddingRight="@dimen/app_usage_filter_padding_horizontal_sw600dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_usage_pick_date"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/app_usage_small_font_size"
                     android:gravity="center_vertical" />
 
                 <Spinner
@@ -80,16 +78,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="0dp"
-                android:paddingBottom="20dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
+                android:paddingBottom="@dimen/app_usage_filter_padding_bottom_sw600dp"
+                android:paddingLeft="@dimen/app_usage_filter_padding_horizontal_sw600dp"
+                android:paddingRight="@dimen/app_usage_filter_padding_horizontal_sw600dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_usage_pick_limit"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/app_usage_small_font_size"
                     android:gravity="center_vertical"
                     android:layout_weight="0" />
 

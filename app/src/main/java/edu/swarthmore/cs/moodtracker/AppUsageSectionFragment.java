@@ -31,9 +31,12 @@ public class AppUsageSectionFragment extends Fragment {
     public static final String STATE_DATE_RANGE_SELECTION = "date_range_selection";
     public static final String STATE_DISPLAY_LIMIT_SELECTION = "display_limit_selection";
 
-    // Filter variables.
+    // Initialization Variables. See allInitialized() for more details.
+    private boolean mResumeInitialized = false;
     private boolean mDateRangeInitialized = false;
     private boolean mDisplayLimitInitialized = false;
+
+    // Filter variables.
     private int mDateRange = 0;
     private int mDisplayLimit = -1;
 
@@ -69,6 +72,14 @@ public class AppUsageSectionFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mResumeInitialized = true;
+        if (allInitialized())
+            updateAppUsageList();
+    }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -76,6 +87,7 @@ public class AppUsageSectionFragment extends Fragment {
         outState.putInt(STATE_DISPLAY_LIMIT_SELECTION, mDisplayLimitSpinner.getSelectedItemPosition());
         super.onSaveInstanceState(outState);
     }
+
 
     /**
      * When MainActivity connects to the service, call this function to deliver service instance.
@@ -152,8 +164,18 @@ public class AppUsageSectionFragment extends Fragment {
     }
 
 
+    /**
+     * We want to call updateUsageList() when the following things happen:
+     *   - onResume(), onCreateView(), setService()
+     *   - a new value is selected for mDateRangeSpinner and mDisplayLimitSpinner
+     * However, some of them might throw errors if others are not initialized. Moreover, some of them
+     * can overlap when the fragment is first created, and we call updateUsageList() 3-4 times, which
+     * is really slow and inefficient. This function helps by checking everything has been initialized,
+     * and we only update list in updateUsageList() if it returns true.
+     * @return true if all necessary components have been initialized. false otherwise.
+     */
     private boolean allInitialized() {
-        return (mDateRangeInitialized && mDisplayLimitInitialized &&
+        return (mDateRangeInitialized && mDisplayLimitInitialized && mResumeInitialized &&
                 mService != null && mAppUsageListView != null);
     }
 
@@ -217,12 +239,13 @@ public class AppUsageSectionFragment extends Fragment {
                 // Query, sort, and apply display limit to app usage list.
                 List<AppUsageEntry> result = mService.getAppUsageInfo(params[0]);
                 Collections.sort(result, new AppUsageEntryComparator());
-                if (mDisplayLimit >= 0 && mDisplayLimit < result.size())
+                if (mDisplayLimit >= 0 && mDisplayLimit < result.size()) {
                     result = result.subList(0, mDisplayLimit);
-
+                }
                 return result;
             }
-            return null;
+            else
+                return null;
         }
 
         protected void onProgressUpdate(Integer... progress) {

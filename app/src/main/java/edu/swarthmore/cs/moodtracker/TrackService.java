@@ -209,10 +209,15 @@ public class TrackService extends Service{
      * @return A collection of AppUsageEntry objects.
      */
     public List<AppUsageEntry> getAppUsageInfo(int dateRange) {
-        if (dateRange < 0)
-            return mDatabase.readAppUsage(-1, mCurrentDate);
-        else
-            return mDatabase.readAppUsage(mCurrentDate-dateRange, mCurrentDate);
+        if (dateRange == 0)
+            return new ArrayList<AppUsageEntry>(mAppUsageInfo.values());
+        else {
+            saveDataToDatabase();
+            if (dateRange < 0)
+                return mDatabase.readAppUsage(-1, mCurrentDate);
+            else
+                return mDatabase.readAppUsage(mCurrentDate-dateRange, mCurrentDate);
+        }
     }
 
 

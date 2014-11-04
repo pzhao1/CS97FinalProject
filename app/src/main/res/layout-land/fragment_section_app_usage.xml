@@ -32,11 +32,10 @@
             android:id="@+id/app_usage_list"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:fadeScrollbars="false" />
+            android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="180dp"
+            android:layout_width="@dimen/app_usage_filter_panel_width_land"
             android:layout_height="match_parent"
             android:layout_weight="0"
             android:orientation="vertical"
@@ -44,9 +43,9 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="@dimen/app_usage_filter_title_height"
                 android:textStyle="bold"
-                android:textSize="20sp"
+                android:textSize="@dimen/app_usage_normal_font_size"
                 android:text="@string/app_usage_filter_title"
                 android:gravity="center"/>
 
@@ -54,16 +53,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="0dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
+                android:paddingBottom="@dimen/app_usage_filter_padding_bottom"
+                android:paddingLeft="@dimen/app_usage_filter_padding_horizontal"
+                android:paddingRight="@dimen/app_usage_filter_padding_horizontal"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_usage_pick_date"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/app_usage_small_font_size"
                     android:gravity="center_vertical" />
 
                 <Spinner
@@ -79,16 +78,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="0dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
+                android:paddingBottom="@dimen/app_usage_filter_padding_bottom"
+                android:paddingLeft="@dimen/app_usage_filter_padding_horizontal"
+                android:paddingRight="@dimen/app_usage_filter_padding_horizontal"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_usage_pick_limit"
-                    android:textSize="15sp"
+                    android:textSize="@dimen/app_usage_small_font_size"
                     android:gravity="center_vertical"
                     android:layout_weight="0" />
 
