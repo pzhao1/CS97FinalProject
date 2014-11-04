@@ -19,7 +19,6 @@ public class NotificationAlarmService extends Service{
     @Override
     public IBinder onBind(Intent arg0)
     {
-        // TODO Auto-generated method stub? I don't understand this
         Log.d(TAG, "onBind()");
         return null;
     }

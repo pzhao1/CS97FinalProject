@@ -56,25 +56,25 @@ public class MainActivity extends Activity
         mCalendar1.set(Calendar.HOUR_OF_DAY, 9); //add more here
         mCalendar1.set(Calendar.MINUTE, 0);
         mCalendar1.set(Calendar.SECOND, 0);
-        mCalendar1.set(Calendar.AM_PM, 1);
+        mCalendar1.set(Calendar.AM_PM, Calendar.AM);
         Calendar mCalendar2 = Calendar.getInstance();
         mCalendar2.set(Calendar.HOUR_OF_DAY, 3); //add more here
         mCalendar2.set(Calendar.MINUTE, 0);
         mCalendar2.set(Calendar.SECOND, 0);
-        mCalendar2.set(Calendar.AM_PM, 0);
+        mCalendar2.set(Calendar.AM_PM, Calendar.PM);
         Calendar mCalendar3 = Calendar.getInstance();
         mCalendar3.set(Calendar.HOUR_OF_DAY, 10); //add more here
-        mCalendar3.set(Calendar.MINUTE, 0);
-        mCalendar3.set(Calendar.SECOND, 0);
-        mCalendar3.set(Calendar.AM_PM, 0);
+        mCalendar3.set(Calendar.MINUTE, 41);
+        mCalendar3.set(Calendar.SECOND, 00);
+        mCalendar3.set(Calendar.AM_PM, Calendar.PM);
 
         Intent myIntent = new Intent(this, NotificationReceiver.class);
         PendingIntent mPendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
 
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar1.getTimeInMillis(),mAlarmManager.INTERVAL_DAY, mPendingIntent);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar2.getTimeInMillis(),mAlarmManager.INTERVAL_DAY, mPendingIntent);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar3.getTimeInMillis(),mAlarmManager.INTERVAL_DAY, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar1.getTimeInMillis(),AlarmManager.INTERVAL_DAY, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar2.getTimeInMillis(),AlarmManager.INTERVAL_DAY, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar3.getTimeInMillis(),AlarmManager.INTERVAL_DAY, mPendingIntent);
     }
 
 
