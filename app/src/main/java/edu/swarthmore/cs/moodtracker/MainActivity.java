@@ -136,19 +136,23 @@ public class MainActivity extends Activity
      * Show the notifications to remind users to take the survey.
      */
     private void setNotificationForSurvey() {
+
+        Log.d("setNotificationForSurvey","called");
         // Set alarm for survey
         Calendar mCalendar;
         PendingIntent mPendingIntent;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
         Intent myIntent = new Intent(this, NotificationReceiver.class);
         int[] times = {9,15,22};
+
         for (int i=0; i<3; i++) {
             mCalendar = Calendar.getInstance();
             mCalendar.set(Calendar.HOUR_OF_DAY, times[i]);
             mCalendar.set(Calendar.MINUTE, 00);
             mCalendar.set(Calendar.SECOND, 0);
-            mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, 0);
-            mAlarmManager.set(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), mPendingIntent);
+            mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            //mAlarmManager.cancel(mPendingIntent);
+            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(),  AlarmManager.INTERVAL_DAY, mPendingIntent);
         }
     }
 
