@@ -13,6 +13,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -32,11 +33,14 @@ public class MainActivity extends Activity
     private TrackService mService;
     private ServiceConnection mServiceConnection = new TrackServiceConnection();
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int selectedDrawerItem = 0;
+
+        Intent startIntent = getIntent();
+        selectedDrawerItem = startIntent.getIntExtra("SelectDrawerItem", 0);
+
 
         // Start and bind to the TrackService
         Intent intent = new Intent(this, TrackService.class);
@@ -50,7 +54,7 @@ public class MainActivity extends Activity
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-
+        mNavigationDrawerFragment.setCurrentSelectedPosition(selectedDrawerItem);
 
         setNotificationForSurvey();
     }
@@ -133,29 +137,19 @@ public class MainActivity extends Activity
      */
     private void setNotificationForSurvey() {
         // Set alarm for survey
-        Calendar mCalendar1 = Calendar.getInstance();
-        mCalendar1.set(Calendar.HOUR_OF_DAY, 9); //add more here
-        mCalendar1.set(Calendar.MINUTE, 0);
-        mCalendar1.set(Calendar.SECOND, 0);
-        mCalendar1.set(Calendar.AM_PM, Calendar.AM);
-        Calendar mCalendar2 = Calendar.getInstance();
-        mCalendar2.set(Calendar.HOUR_OF_DAY, 3); //add more here
-        mCalendar2.set(Calendar.MINUTE, 0);
-        mCalendar2.set(Calendar.SECOND, 0);
-        mCalendar2.set(Calendar.AM_PM, Calendar.PM);
-        Calendar mCalendar3 = Calendar.getInstance();
-        mCalendar3.set(Calendar.HOUR_OF_DAY, 10); //add more here
-        mCalendar3.set(Calendar.MINUTE, 00);
-        mCalendar3.set(Calendar.SECOND, 00);
-        mCalendar3.set(Calendar.AM_PM, Calendar.PM);
-
-        Intent myIntent = new Intent(this, NotificationReceiver.class);
-        PendingIntent mPendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
-
+        Calendar mCalendar;
+        PendingIntent mPendingIntent;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar1.getTimeInMillis(),AlarmManager.INTERVAL_DAY, mPendingIntent);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar2.getTimeInMillis(),AlarmManager.INTERVAL_DAY, mPendingIntent);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar3.getTimeInMillis(),AlarmManager.INTERVAL_DAY, mPendingIntent);
+        Intent myIntent = new Intent(this, NotificationReceiver.class);
+        int[] times = {9,15,22};
+        for (int i=0; i<3; i++) {
+            mCalendar = Calendar.getInstance();
+            mCalendar.set(Calendar.HOUR_OF_DAY, times[i]);
+            mCalendar.set(Calendar.MINUTE, 00);
+            mCalendar.set(Calendar.SECOND, 0);
+            mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, 0);
+            mAlarmManager.set(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), mPendingIntent);
+        }
     }
 
     /**
