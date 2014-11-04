@@ -188,6 +188,10 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
+    public void setCurrentSelectedPosition(int currentSelectedPosition) {
+        mCurrentSelectedPosition = currentSelectedPosition;
+    }
+
     private void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
