@@ -1,7 +1,7 @@
 package edu.swarthmore.cs.moodtracker;
 
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +12,6 @@ import android.widget.TextView;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.swarthmore.cs.moodtracker.R;
 import edu.swarthmore.cs.moodtracker.util.SurveyArrayAdapter;
 
 /**

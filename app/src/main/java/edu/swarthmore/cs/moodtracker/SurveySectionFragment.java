@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import edu.swarthmore.cs.moodtracker.R;
-
 /**
  * Created by rliang on 11/4/14.
  */
