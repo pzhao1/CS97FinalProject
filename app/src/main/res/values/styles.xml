@@ -14,17 +14,22 @@
         <item name="android:padding">@dimen/survey_text_padding</item>
     </style>
 
-    <style name="SurveyHeaderWhiteText">
+
+    <style name="WhiteText">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="SurveyQuestionHeader" parent="SurveyHeaderWhiteText">
+    <style name="SurveyQuestionHeader" parent="WhiteText">
         <item name="android:textSize">@dimen/survey_heading_text</item>
     </style>
 
-    <style name="SurveyQuestionSubHeader" parent="SurveyHeaderWhiteText">
+    <style name="SurveyQuestionSubHeader" parent="WhiteText">
         <item name="android:textSize">@dimen/survey_heading_subtext</item>
+    </style>
+
+    <style name="TakeSurveyButton" parent="WhiteText">
+        <item name="android:textSize">@dimen/take_survey_text</item>
     </style>
 
 </resources>

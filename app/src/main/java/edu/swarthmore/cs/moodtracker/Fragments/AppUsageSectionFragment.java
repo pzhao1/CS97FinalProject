@@ -1,10 +1,10 @@
-package edu.swarthmore.cs.moodtracker;
+package edu.swarthmore.cs.moodtracker.Fragments;
 
 /**
  * Created by Peng on 10/19/2014.
  */
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import edu.swarthmore.cs.moodtracker.R;
+import edu.swarthmore.cs.moodtracker.TrackService;
 import edu.swarthmore.cs.moodtracker.util.AppUsageEntry;
 import edu.swarthmore.cs.moodtracker.util.AppUsageListAdapter;
 

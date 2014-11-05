@@ -35,13 +35,16 @@
     <dimen name="app_usage_small_font_size">15sp</dimen>
 
     <!--Survey Dimensions-->
-    <dimen name="text_survey">15dp</dimen>
     <dimen name="survey_text_padding">10dp</dimen>
     <dimen name="margin_checkmark">12dp</dimen>
-    <dimen name="survey_heading_text">12dp</dimen>
-    <dimen name="survey_heading_subtext">16dp</dimen>
     <dimen name="survey_list_horizonal_padding">30dp</dimen>
     <dimen name="survey_list_bottom_padding">20dp</dimen>
     <dimen name="survey_list_top_padding">160dp</dimen>
+    <dimen name="take_survey_button">80dp</dimen>
+
+    <dimen name="text_survey">15sp</dimen>
+    <dimen name="survey_heading_text">12sp</dimen>
+    <dimen name="survey_heading_subtext">16sp</dimen>
+    <dimen name="take_survey_text">16sp</dimen>
 
 </resources>

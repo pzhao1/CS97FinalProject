@@ -1,9 +1,9 @@
-package edu.swarthmore.cs.moodtracker;
+package edu.swarthmore.cs.moodtracker.Fragments;
 
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -21,6 +21,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import edu.swarthmore.cs.moodtracker.R;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -186,7 +188,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
 
-    protected void selectItem(int position) {
+    public void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);

@@ -1,11 +1,13 @@
-package edu.swarthmore.cs.moodtracker;
+package edu.swarthmore.cs.moodtracker.Fragments;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import edu.swarthmore.cs.moodtracker.R;
 
 /**
  * Created by Peng on 10/19/2014.
