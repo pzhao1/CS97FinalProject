@@ -23,7 +23,7 @@
         android:scaleX=".5"
         android:layout_centerVertical="true"
         android:src="@drawable/survey_checkmark"
-        android:layout_marginRight="@dimen/margin_checkmark"
+        android:layout_marginLeft="@dimen/margin_checkmark"
     />
 
 </RelativeLayout>
