@@ -40,7 +40,7 @@ public class SurveySectionFragment extends Fragment {
             public void onClick(View v) {
                 Intent surveyIntent = new Intent(getActivity(), TakeSurveyActivity.class);
                 startActivity(surveyIntent);
-                getActivity().overridePendingTransition(R.anim.slide_enter, R.anim.slide_exit);
+                getActivity().overridePendingTransition(R.anim.slide_enter, R.anim.pop_exit);
             }
         });
     }

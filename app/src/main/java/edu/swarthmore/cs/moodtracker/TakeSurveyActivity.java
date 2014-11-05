@@ -22,14 +22,17 @@ public class TakeSurveyActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set title bar
+        setTitle(R.string.survey_questionnaire);
+
         setContentView(R.layout.activity_take_survey);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.viewpager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
-        // Set title bar
-        setTitle(R.string.survey_questionnaire);
+
     }
 
     @Override
@@ -44,12 +47,6 @@ public class TakeSurveyActivity extends FragmentActivity {
         }
     }
 
-
-
-    /**
-     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-     * sequence.
-     */
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -69,6 +66,6 @@ public class TakeSurveyActivity extends FragmentActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_enter, R.anim.slide_exit);
+        overridePendingTransition(R.anim.pop_enter, R.anim.slide_exit);
     }
 }
