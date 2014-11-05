@@ -28,12 +28,6 @@
         android:layout_height="match_parent"
         android:orientation="horizontal" >
 
-        <ListView
-            android:id="@+id/app_usage_list"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
         <LinearLayout
             android:layout_width="@dimen/app_usage_filter_panel_width_land"
             android:layout_height="match_parent"
@@ -100,6 +94,12 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <ListView
+            android:id="@+id/app_usage_list"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
     </LinearLayout>
 

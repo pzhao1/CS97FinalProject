@@ -263,11 +263,6 @@ public class TrackService extends Service{
                 Log.e(TAG, e.toString());
             }
         }
-
-        System.out.println("Launcher Process Names: ");
-        for (String processName : mLauncherProcessNames) {
-            System.out.println(processName);
-        }
     }
 
 

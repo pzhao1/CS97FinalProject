@@ -13,6 +13,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,6 +24,8 @@ public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     public static final String TAG = "MainActivity";
+    public static final String EXTRA_DRAWER_SELECT = "SelectDrawerItem";
+
     // Navigation Drawer
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Fragment mCurrentSectionFragment;
@@ -35,27 +38,29 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int selectedDrawerItem;
-
-        Intent startIntent = getIntent();
-        selectedDrawerItem = startIntent.getIntExtra("SelectDrawerItem", 0);
-
+        setContentView(R.layout.activity_main);
 
         // Start and bind to the TrackService
         Intent intent = new Intent(this, TrackService.class);
         startService(intent);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
-        setContentView(R.layout.activity_main);
-
         // Set up the drawer.
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-        mNavigationDrawerFragment.selectItem(selectedDrawerItem);
+
+        // If we started from notification, then the intent will contain a "SelectDrawerItem" extra
+        // that points to the survey section. Select it. Otherwise, select 0.
+        mNavigationDrawerFragment.selectItem(getIntent().getIntExtra(EXTRA_DRAWER_SELECT, 0));
 
         setNotificationForSurvey();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        mNavigationDrawerFragment.selectItem(getIntent().getIntExtra(EXTRA_DRAWER_SELECT, 0));
     }
 
 
@@ -136,7 +141,7 @@ public class MainActivity extends Activity
      */
     private void setNotificationForSurvey() {
 
-        Log.d("setNotificationForSurvey","called");
+        Log.d("setNotificationForSurvey", "called");
         // Set alarm for survey
         Calendar mCalendar;
         PendingIntent mPendingIntent;
@@ -151,7 +156,7 @@ public class MainActivity extends Activity
             mCalendar.set(Calendar.SECOND, 0);
             mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             //mAlarmManager.cancel(mPendingIntent);
-            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(),  AlarmManager.INTERVAL_DAY, mPendingIntent);
+            mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
         }
     }
 

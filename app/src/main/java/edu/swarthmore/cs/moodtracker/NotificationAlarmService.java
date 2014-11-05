@@ -37,7 +37,7 @@ public class NotificationAlarmService extends Service{
                 .setAutoCancel(true);
         // When user clicks the notification, open MoodTracker survey
         Intent resultIntent = new Intent(this, MainActivity.class);
-        resultIntent.putExtra("SelectDrawerItem", 2);
+        resultIntent.putExtra(MainActivity.EXTRA_DRAWER_SELECT, 2);
         mPendingIntent = PendingIntent.getActivity(this,0,resultIntent,PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(mPendingIntent);
 
