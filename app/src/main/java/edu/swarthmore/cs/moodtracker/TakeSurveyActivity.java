@@ -55,9 +55,6 @@ public class TakeSurveyActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_survey);
 
-        // Set title bar
-        setTitle(R.string.survey_questionnaire);
-
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.viewpager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());

@@ -23,6 +23,7 @@
 
         <activity
             android:name=".TakeSurveyActivity"
+            android:label="@string/take_survey_text"
         />
 
         <service android:name=".TrackService" />
