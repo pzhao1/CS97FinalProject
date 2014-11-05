@@ -28,7 +28,8 @@ public class SurveyQuestionFragment extends Fragment {
     private ListView mListView;
     private TextView mHeader;
     private TextView mQuestionSubheader;
-    private int mListOriginalScrollY;
+    private String mQuestion;
+    private int mPageNumber;
 
     private static final String[] QUESTION_TEXT = {
             "1    (Very Slightly or Not at All)" ,
@@ -53,6 +54,13 @@ public class SurveyQuestionFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mQuestion = getArguments().getString(TakeSurveyActivity.MOOD_QUESTION);
+        mPageNumber = getArguments().getInt(TakeSurveyActivity.QUESTION_PAGE);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_survey_question, container, false);
@@ -70,8 +78,11 @@ public class SurveyQuestionFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mHeader.setText("Example");
-        mQuestionSubheader.setText("Hello?");
+        mHeader.setText("Question" + mPageNumber);
+
+        StringBuilder fullQuestion = new StringBuilder("To what extent are you feeling right now?");
+        fullQuestion.insert(fullQuestion.indexOf("g") + 1, " " + mQuestion);
+        mQuestionSubheader.setText(fullQuestion);
 
         if (mAdapter == null) {
             List<String> options = Arrays.asList(QUESTION_TEXT);
@@ -102,8 +113,5 @@ public class SurveyQuestionFragment extends Fragment {
                 }
             }
         });
-
     }
-
-
 }

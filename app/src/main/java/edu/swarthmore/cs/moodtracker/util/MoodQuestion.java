@@ -4,15 +4,16 @@ package edu.swarthmore.cs.moodtracker.util;
  * Created by rliang on 11/3/14.
  */
 public class MoodQuestion {
-    public static final String MOOD_ACTIVE = "active";
-    public static final String MOOD_DETERMINED = "determined";
-    public static final String MOOD_ATTENTIVE = "mood_attentive";
-    public static final String MOOD_INSPIRED = "mood_inspired";
-    public static final String MOOD_ALERT = "mood_alert";
-    public static final String MOOD_AFRAID = "afraid";
-    public static final String MOOD_NERVOUS = "nervous";
-    public static final String MOOD_UPSET = "upset";
-    public static final String MOOD_HOSTILE = "hostile";
+    public static final String MOOD_ACTIVE = "Active";
+    public static final String MOOD_DETERMINED = "Determined";
+    public static final String MOOD_ATTENTIVE = "Attentive";
+    public static final String MOOD_INSPIRED = "Inspired";
+    public static final String MOOD_ALERT = "Alert";
+    public static final String MOOD_AFRAID = "Afraid";
+    public static final String MOOD_NERVOUS = "Nervous";
+    public static final String MOOD_UPSET = "Upset";
+    public static final String MOOD_HOSTILE = "Hostile";
+    public static final String MOOD_ASHAMED = "Ashamed";
 
     public enum QuestionType {
         QUESTION_TYPE_RATING ("rating");

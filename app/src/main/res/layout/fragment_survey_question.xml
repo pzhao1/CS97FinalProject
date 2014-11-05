@@ -19,6 +19,7 @@
             style="@style/SurveyQuestionHeader"
             android:textAllCaps="true"
             android:typeface="normal"
+            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -26,6 +27,7 @@
             style="@style/SurveyQuestionSubHeader"
             android:layout_marginTop="5dp"
             android:typeface="serif"
+            android:gravity="center"
             android:id="@+id/section_question"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
