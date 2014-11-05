@@ -45,7 +45,7 @@ public class TakeSurveyActivity extends FragmentActivity {
         PAGES_MAP = Collections.unmodifiableMap(tmp);
     }
 
-    private static int mNumPages = 1;
+    private int mNumPages = 1;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private HashMap<Integer, Integer> mResults;
@@ -120,6 +120,7 @@ public class TakeSurveyActivity extends FragmentActivity {
     }
 
     public void selectedRating(HashMap<Integer, Integer> results) {
+        invalidateOptionsMenu();
         mResults = results;
 
         int nextPage = mPager.getCurrentItem() + 1;
