@@ -60,7 +60,7 @@ public class MainActivity extends Activity
 
     @Override
     protected void onNewIntent(Intent intent) {
-        mNavigationDrawerFragment.selectItem(getIntent().getIntExtra(EXTRA_DRAWER_SELECT, 0));
+        mNavigationDrawerFragment.selectItem(intent.getIntExtra(EXTRA_DRAWER_SELECT, 0));
     }
 
 
