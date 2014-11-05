@@ -15,53 +15,31 @@ public class MoodQuestion {
     public static final String MOOD_HOSTILE = "Hostile";
     public static final String MOOD_ASHAMED = "Ashamed";
 
-    public enum QuestionType {
-        QUESTION_TYPE_RATING ("rating");
-        private final String type;
-
-        private QuestionType(String s) {
-            type = s;
-        }
-
-        public boolean equalsType(String otherType){
-            return otherType != null && type.equals(otherType);
-        }
-
-        public String toString(){
-            return type;
-        }
-    }
-
-    private QuestionType mQuestionType;
     private String mQuestion;
     private String mAnswer;
 
     public static MoodQuestion questionFromDBString(String encodedString) {
         String[] decodedInfo = StringEncodeUtil.decode(encodedString);
-        return new MoodQuestion(QuestionType.valueOf(decodedInfo[0]), decodedInfo[1], decodedInfo[2]);
+        return new MoodQuestion(decodedInfo[1], decodedInfo[2]);
     }
 
-    public MoodQuestion(QuestionType questionType, String question, String answer) {
-        mQuestionType = questionType;
+    public MoodQuestion(String question, String answer) {
         mQuestion = question;
         mAnswer = answer;
     }
 
-    public String getmQuestion() {
+    public String getQuestion() {
         return mQuestion;
     }
 
-    public String getmAnswer() {
+    public String getAnswer() {
         return mAnswer;
     }
 
-    public QuestionType getmQuestionType() {
-        return mQuestionType;
-    }
 
     @Override
     public String toString() {
-        String[] toEncode = new String[] {mQuestionType.toString(), mQuestion, mAnswer};
+        String[] toEncode = new String[] {mQuestion, mAnswer};
         return StringEncodeUtil.encode(toEncode);
     }
 }

@@ -7,8 +7,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.MenuItem;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,6 +24,8 @@ public class TakeSurveyActivity extends FragmentActivity {
 
     public static final String MOOD_QUESTION = "mood_question";
     public static final String QUESTION_PAGE = "question_page";
+    public static final String RESULTS = "results";
+
     public static final int MAX_PAGES = 10;
 
     static final Map<Integer, String> PAGES_MAP;
@@ -43,8 +47,8 @@ public class TakeSurveyActivity extends FragmentActivity {
 
     private static int mNumPages = 1;
     private ViewPager mPager;
-
     private PagerAdapter mPagerAdapter;
+    private HashMap<Integer, Integer> mResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,18 @@ public class TakeSurveyActivity extends FragmentActivity {
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
+        mResults = new HashMap<Integer, Integer>();
+
         getActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+
+        return true;
     }
 
     @Override
@@ -84,6 +99,7 @@ public class TakeSurveyActivity extends FragmentActivity {
             Bundle args = new Bundle();
             args.putString(MOOD_QUESTION, PAGES_MAP.get(position));
             args.putInt(QUESTION_PAGE, position);
+            args.putSerializable(RESULTS, mResults);
 
             SurveyQuestionFragment sqf = new SurveyQuestionFragment();
             sqf.setArguments(args);
@@ -103,7 +119,9 @@ public class TakeSurveyActivity extends FragmentActivity {
         overridePendingTransition(R.anim.pop_enter, R.anim.slide_exit);
     }
 
-    public void selectedRating() {
+    public void selectedRating(HashMap<Integer, Integer> results) {
+        mResults = results;
+
         int nextPage = mPager.getCurrentItem() + 1;
         if (nextPage == MAX_PAGES) {
           return;

@@ -1,6 +1,7 @@
 <resources>
     <style name="MoodTracker" parent="android:style/Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/MoodTrackerActionBar</item>
+        <item name="android:actionMenuTextColor">@color/text_dark_grey</item>
     </style>
 
     <style name="MoodTrackerActionBar" parent="android:style/Widget.Holo.ActionBar">

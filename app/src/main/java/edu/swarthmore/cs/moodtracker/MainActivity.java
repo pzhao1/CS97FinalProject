@@ -74,16 +74,16 @@ public class MainActivity extends FragmentActivity
                 AppUsageSectionFragment usageFragment = new AppUsageSectionFragment();
                 if (mService != null)
                     usageFragment.setService(mService);
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.title_section_app_usage);
                 mCurrentSectionFragment = usageFragment;
                 break;
             case 1:
                 mCurrentSectionFragment = new TextSectionFragment();
-                mTitle = getString(R.string.title_section2);
+                mTitle = getString(R.string.title_section_text_analysis);
                 break;
             case 2:
                 mCurrentSectionFragment = new SurveySectionFragment();
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.title_section_surveys);
                 break;
         }
 

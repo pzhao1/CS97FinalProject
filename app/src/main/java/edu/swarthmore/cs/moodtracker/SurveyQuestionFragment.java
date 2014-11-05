@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import edu.swarthmore.cs.moodtracker.util.SurveyArrayAdapter;
@@ -30,6 +31,7 @@ public class SurveyQuestionFragment extends Fragment {
     private TextView mQuestionSubheader;
     private String mQuestion;
     private int mPageNumber;
+    private HashMap<Integer, Integer> mResults;
 
     private static final String[] QUESTION_TEXT = {
             "1    (Very Slightly or Not at All)" ,
@@ -45,8 +47,10 @@ public class SurveyQuestionFragment extends Fragment {
             if (mAdapter != null) {
                 mAdapter.setSelection(row);
                 mAdapter.notifyDataSetChanged();
-                notifyParentOfSelection();
             }
+
+            notifyParentOfSelection(mResults);
+            mResults.put(mPageNumber, row);
         }
     };
 
@@ -59,6 +63,7 @@ public class SurveyQuestionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mQuestion = getArguments().getString(TakeSurveyActivity.MOOD_QUESTION);
         mPageNumber = getArguments().getInt(TakeSurveyActivity.QUESTION_PAGE);
+        mResults = (HashMap<Integer, Integer>)getArguments().getSerializable(TakeSurveyActivity.RESULTS);
     }
 
     @Override
@@ -114,9 +119,15 @@ public class SurveyQuestionFragment extends Fragment {
                 }
             }
         });
+
+        int selectedIndex = mResults.containsKey(mPageNumber) ? mResults.get(mPageNumber) : -1;
+        if (selectedIndex > -1) {
+            mAdapter.setSelection(mResults.get(mPageNumber));
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
-    public void notifyParentOfSelection() {
-        ((TakeSurveyActivity) getActivity()).selectedRating();
+    public void notifyParentOfSelection(HashMap<Integer, Integer> results) {
+        ((TakeSurveyActivity) getActivity()).selectedRating(results);
     }
 }
