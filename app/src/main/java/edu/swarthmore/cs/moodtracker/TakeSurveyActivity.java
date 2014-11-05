@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import edu.swarthmore.cs.moodtracker.util.MoodQuestion;
+import edu.swarthmore.cs.moodtracker.util.MoodRatingQuestion;
 
 
 /**
@@ -31,16 +31,16 @@ public class TakeSurveyActivity extends FragmentActivity {
     static final Map<Integer, String> PAGES_MAP;
     static {
         Map<Integer, String> tmp = new LinkedHashMap<Integer, String>();
-        tmp.put(0, MoodQuestion.MOOD_ACTIVE);
-        tmp.put(1, MoodQuestion.MOOD_DETERMINED);
-        tmp.put(2, MoodQuestion.MOOD_ATTENTIVE);
-        tmp.put(3, MoodQuestion.MOOD_INSPIRED);
-        tmp.put(4, MoodQuestion.MOOD_ALERT);
-        tmp.put(5, MoodQuestion.MOOD_AFRAID);
-        tmp.put(6, MoodQuestion.MOOD_NERVOUS);
-        tmp.put(7, MoodQuestion.MOOD_UPSET);
-        tmp.put(8, MoodQuestion.MOOD_HOSTILE);
-        tmp.put(9, MoodQuestion.MOOD_ASHAMED);
+        tmp.put(0, MoodRatingQuestion.MOOD_ACTIVE);
+        tmp.put(1, MoodRatingQuestion.MOOD_DETERMINED);
+        tmp.put(2, MoodRatingQuestion.MOOD_ATTENTIVE);
+        tmp.put(3, MoodRatingQuestion.MOOD_INSPIRED);
+        tmp.put(4, MoodRatingQuestion.MOOD_ALERT);
+        tmp.put(5, MoodRatingQuestion.MOOD_AFRAID);
+        tmp.put(6, MoodRatingQuestion.MOOD_NERVOUS);
+        tmp.put(7, MoodRatingQuestion.MOOD_UPSET);
+        tmp.put(8, MoodRatingQuestion.MOOD_HOSTILE);
+        tmp.put(9, MoodRatingQuestion.MOOD_ASHAMED);
 
         PAGES_MAP = Collections.unmodifiableMap(tmp);
     }

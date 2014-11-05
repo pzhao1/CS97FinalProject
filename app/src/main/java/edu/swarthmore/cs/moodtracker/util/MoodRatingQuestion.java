@@ -3,7 +3,7 @@ package edu.swarthmore.cs.moodtracker.util;
 /**
  * Created by rliang on 11/3/14.
  */
-public class MoodQuestion {
+public class MoodRatingQuestion {
     public static final String MOOD_ACTIVE = "Active";
     public static final String MOOD_DETERMINED = "Determined";
     public static final String MOOD_ATTENTIVE = "Attentive";
@@ -16,14 +16,14 @@ public class MoodQuestion {
     public static final String MOOD_ASHAMED = "Ashamed";
 
     private String mQuestion;
-    private String mAnswer;
+    private Integer mAnswer;
 
-    public static MoodQuestion questionFromDBString(String encodedString) {
+    public static MoodRatingQuestion questionFromDBString(String encodedString) {
         String[] decodedInfo = StringEncodeUtil.decode(encodedString);
-        return new MoodQuestion(decodedInfo[1], decodedInfo[2]);
+        return new MoodRatingQuestion(decodedInfo[1], new Integer(decodedInfo[2]));
     }
 
-    public MoodQuestion(String question, String answer) {
+    public MoodRatingQuestion(String question, int answer) {
         mQuestion = question;
         mAnswer = answer;
     }
@@ -32,14 +32,14 @@ public class MoodQuestion {
         return mQuestion;
     }
 
-    public String getAnswer() {
+    public int getAnswer() {
         return mAnswer;
     }
 
 
     @Override
     public String toString() {
-        String[] toEncode = new String[] {mQuestion, mAnswer};
+        String[] toEncode = new String[] {mQuestion, mAnswer.toString()};
         return StringEncodeUtil.encode(toEncode);
     }
 }
