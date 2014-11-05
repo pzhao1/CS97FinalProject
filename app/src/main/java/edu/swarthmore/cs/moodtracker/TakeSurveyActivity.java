@@ -22,6 +22,7 @@ public class TakeSurveyActivity extends FragmentActivity {
 
     public static final String MOOD_QUESTION = "mood_question";
     public static final String QUESTION_PAGE = "question_page";
+    public static final int MAX_PAGES = 10;
 
     static final Map<Integer, String> PAGES_MAP;
     static {
@@ -48,15 +49,17 @@ public class TakeSurveyActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_take_survey);
 
         // Set title bar
         setTitle(R.string.survey_questionnaire);
 
-        setContentView(R.layout.activity_take_survey);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.viewpager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -84,6 +87,7 @@ public class TakeSurveyActivity extends FragmentActivity {
 
             SurveyQuestionFragment sqf = new SurveyQuestionFragment();
             sqf.setArguments(args);
+            sqf.setRetainInstance(true);
             return sqf;
         }
 
@@ -101,7 +105,9 @@ public class TakeSurveyActivity extends FragmentActivity {
 
     public void selectedRating() {
         int nextPage = mPager.getCurrentItem() + 1;
-        if (nextPage == mNumPages) {
+        if (nextPage == MAX_PAGES) {
+          return;
+        } else if (nextPage == mNumPages) {
             mNumPages++;
         }
 

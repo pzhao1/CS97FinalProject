@@ -45,6 +45,7 @@ public class SurveyQuestionFragment extends Fragment {
             if (mAdapter != null) {
                 mAdapter.setSelection(row);
                 mAdapter.notifyDataSetChanged();
+                notifyParentOfSelection();
             }
         }
     };
@@ -78,7 +79,7 @@ public class SurveyQuestionFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mHeader.setText("Question" + mPageNumber);
+        mHeader.setText("Question " + new Integer(mPageNumber + 1));
 
         StringBuilder fullQuestion = new StringBuilder("To what extent are you feeling right now?");
         fullQuestion.insert(fullQuestion.indexOf("g") + 1, " " + mQuestion);
@@ -113,5 +114,9 @@ public class SurveyQuestionFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public void notifyParentOfSelection() {
+        ((TakeSurveyActivity) getActivity()).selectedRating();
     }
 }

@@ -18,7 +18,7 @@ public class SurveyArrayAdapter extends ArrayAdapter<String>{
         public void onRowSelection(int row);
     }
 
-    private int mSelectedIndex = 0;
+    private int mSelectedIndex = -1;
     private RowSelectionListener mListener;
 
     public SurveyArrayAdapter(Context context, int resource, int textViewResourceId, List<String> objects) {
