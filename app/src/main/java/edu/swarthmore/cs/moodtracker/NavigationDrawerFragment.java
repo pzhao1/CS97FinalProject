@@ -29,6 +29,8 @@ import android.widget.Toast;
  */
 public class NavigationDrawerFragment extends Fragment {
 
+    public static final String TAG = "NavigationDrawerFragment";
+
     /**
      * Remember the position of the selected item.
      */
@@ -215,11 +217,13 @@ public class NavigationDrawerFragment extends Fragment {
         mCallbacks = null;
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
+        super.onSaveInstanceState(outState);
     }
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

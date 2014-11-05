@@ -29,6 +29,7 @@ public class MainActivity extends FragmentActivity
     // Navigation Drawer
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Fragment mCurrentSectionFragment;
+    private int mSelectedSection = -1;
     private CharSequence mTitle;
 
     // Connection to TrackService
@@ -51,16 +52,32 @@ public class MainActivity extends FragmentActivity
         mTitle = getTitle();
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        // If we started from notification, then the intent will contain a "SelectDrawerItem" extra
-        // that points to the survey section. Select it. Otherwise, select 0.
-        mNavigationDrawerFragment.selectItem(getIntent().getIntExtra(EXTRA_DRAWER_SELECT, 0));
+        // State management.
+        if (savedInstanceState != null) {
+            // If we have a non-null savedInstanceState, then either user rotated screen, or the activity
+            // was on background for too long and system destroyed it to free memory. In this case,
+            // select the section that user selected last time.
+            mSelectedSection = savedInstanceState.getInt(EXTRA_DRAWER_SELECT, 0);
+        } else {
+            // If we started from notification, then the intent will contain a "SelectDrawerItem" extra
+            // that points to the survey section. Select it. Otherwise, select 0.
+            mSelectedSection = getIntent().getIntExtra(EXTRA_DRAWER_SELECT, 0);
+        }
 
         setNotificationForSurvey();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        mNavigationDrawerFragment.selectItem(intent.getIntExtra(EXTRA_DRAWER_SELECT, 0));
+        mSelectedSection = intent.getIntExtra(EXTRA_DRAWER_SELECT, mSelectedSection);
+        super.onNewIntent(intent);
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(EXTRA_DRAWER_SELECT, mSelectedSection);
+        super.onSaveInstanceState(outState);
     }
 
 
@@ -68,14 +85,14 @@ public class MainActivity extends FragmentActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-
+        mSelectedSection = position;
         switch (position) {
             case 0:
                 AppUsageSectionFragment usageFragment = new AppUsageSectionFragment();
                 if (mService != null)
                     usageFragment.setService(mService);
-                mTitle = getString(R.string.title_section_app_usage);
                 mCurrentSectionFragment = usageFragment;
+                mTitle = getString(R.string.title_section_app_usage);
                 break;
             case 1:
                 mCurrentSectionFragment = new TextSectionFragment();
@@ -87,7 +104,7 @@ public class MainActivity extends FragmentActivity
                 break;
         }
 
-        mCurrentSectionFragment.setRetainInstance(true);
+        //mCurrentSectionFragment.setRetainInstance(true);
         fragmentManager.beginTransaction().replace(R.id.container, mCurrentSectionFragment).commit();
     }
 
@@ -126,10 +143,18 @@ public class MainActivity extends FragmentActivity
 
     @Override
     protected void onPause() {
-        super.onPause();
         if (mService != null)
             mService.saveDataToDatabase();
+        super.onPause();
     }
+
+    @Override
+    protected void onResume() {
+        mNavigationDrawerFragment.selectItem(mSelectedSection);
+        invalidateOptionsMenu();
+        super.onResume();
+    }
+
 
     @Override
     protected void onDestroy(){
