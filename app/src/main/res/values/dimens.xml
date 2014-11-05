@@ -41,6 +41,7 @@
     <dimen name="survey_heading_text">12dp</dimen>
     <dimen name="survey_heading_subtext">16dp</dimen>
     <dimen name="survey_list_horizonal_padding">30dp</dimen>
-    <dimen name="survey_list_vertical_padding">20dp</dimen>
+    <dimen name="survey_list_bottom_padding">20dp</dimen>
+    <dimen name="survey_list_top_padding">160dp</dimen>
 
 </resources>

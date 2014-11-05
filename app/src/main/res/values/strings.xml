@@ -9,6 +9,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
+    <string name="survey_questionnaire">Survey</string>
 
     <!-- Strings for app usage section -->
     <string name="app_usage_waiting_text">Waiting for service to load ...</string>

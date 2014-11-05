@@ -36,9 +36,9 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="180dp"
+        android:paddingTop="@dimen/survey_list_top_padding"
         android:paddingLeft="@dimen/survey_list_horizonal_padding"
         android:paddingRight="@dimen/survey_list_horizonal_padding"
-        android:paddingBottom="@dimen/survey_list_vertical_padding"
+        android:paddingBottom="@dimen/survey_list_bottom_padding"
         android:clipToPadding="false"/>
 </RelativeLayout>
