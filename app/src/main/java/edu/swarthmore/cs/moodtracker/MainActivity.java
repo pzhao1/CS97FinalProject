@@ -87,6 +87,7 @@ public class MainActivity extends FragmentActivity
                 break;
         }
 
+        mCurrentSectionFragment.setRetainInstance(true);
         fragmentManager.beginTransaction().replace(R.id.container, mCurrentSectionFragment).commit();
     }
 

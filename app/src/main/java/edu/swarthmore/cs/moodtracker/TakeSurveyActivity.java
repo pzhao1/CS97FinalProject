@@ -13,31 +13,23 @@ import android.support.v4.view.ViewPager;
  * Created by rliang on 11/4/14.
  */
 public class TakeSurveyActivity extends FragmentActivity {
-    /**
-     * The number of pages (wizard steps) to show in this demo.
-     */
-    private static final int NUM_PAGES = 5;
 
-    /**
-     * The pager widget, which handles animation and allows swiping horizontally to access previous
-     * and next wizard steps.
-     */
+    private static final int NUM_PAGES = 5;
     private ViewPager mPager;
 
-    /**
-     * The pager adapter, which provides the pages to the view pager widget.
-     */
     private PagerAdapter mPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_survey);
-
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.viewpager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+
+        // Set title bar
+        setTitle(R.string.survey_questionnaire);
     }
 
     @Override
@@ -51,6 +43,8 @@ public class TakeSurveyActivity extends FragmentActivity {
             mPager.setCurrentItem(mPager.getCurrentItem() - 1);
         }
     }
+
+
 
     /**
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
@@ -70,5 +64,11 @@ public class TakeSurveyActivity extends FragmentActivity {
         public int getCount() {
             return NUM_PAGES;
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_enter, R.anim.slide_exit);
     }
 }

@@ -13,7 +13,8 @@
 
     <TextView
         style="@style/TakeSurveyButton"
-        android:id="@+id/refund_button"
+        android:id="@+id/take_survey_button"
+        android:text="@string/take_survey_text"
         android:layout_width="match_parent"
         android:layout_height="@dimen/take_survey_button"
         android:gravity="center"

@@ -21,6 +21,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".TakeSurveyActivity"
+        />
+
         <service android:name=".TrackService" />
 
 

@@ -62,8 +62,6 @@ public class SurveyQuestionFragment extends Fragment {
 
         mListView = (ListView) rootView.findViewById(android.R.id.list);
 
-        // Set title bar
-        getActivity().setTitle(R.string.survey_questionnaire);
         setHasOptionsMenu(false);
         return rootView;
     }
