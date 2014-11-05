@@ -19,11 +19,6 @@ import android.view.MenuItem;
 
 import java.util.Calendar;
 
-import edu.swarthmore.cs.moodtracker.Fragments.AppUsageSectionFragment;
-import edu.swarthmore.cs.moodtracker.Fragments.NavigationDrawerFragment;
-import edu.swarthmore.cs.moodtracker.Fragments.SurveyQuestionFragment;
-import edu.swarthmore.cs.moodtracker.Fragments.TextSectionFragment;
-
 
 public class MainActivity extends FragmentActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
