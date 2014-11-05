@@ -7,8 +7,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Binder;
 import android.os.Handler;
@@ -52,8 +54,8 @@ public class TrackService extends Service{
     /* App Usage Tracking Variables */
     private ActivityManager mActivityManager = null;
     private PackageManager mPackageManager = null;
-    private HashSet<String> mFilteredSystemPackagesSet = null;
-    private HashMap<String, AppUsageEntry> mAppUsageInfo;
+    private HashSet<String> mLauncherProcessNames = null;
+    private HashMap<String, AppUsageEntry> mAppUsageInfo = null;
 
 
 
@@ -105,7 +107,6 @@ public class TrackService extends Service{
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "onDestroy()", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onDestroy()");
 
         // Stop timer ticking.
@@ -228,16 +229,45 @@ public class TrackService extends Service{
         // Construct activity manager and package manager.
         mActivityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         mPackageManager = getPackageManager();
+        populateLauncherProcessNames();
+        readDataFromDatabase();
+    }
 
-        // Initialize the system package names set. These are the packages to ignore.
-        mFilteredSystemPackagesSet = new HashSet<String>();
-        String[] allowedSystemPackageNames = getResources().getStringArray(R.array.filtered_system_package_array);
-        for (String packageName: Arrays.asList(allowedSystemPackageNames)) {
-            mFilteredSystemPackagesSet.add(packageName);
+    /**
+     * Populate the launcher app process name HashSet. Only process names in this set are tracked.
+     * We only want to track apps whose icons show in Launcher, because these are the apps that
+     * user is aware of. We don't need things like "NFC Service" or "ASUS Keyboard", even if sometimes
+     * they have foreground importance.
+     */
+    private void populateLauncherProcessNames() {
+
+        HashSet<String> filteredLauncherProcesses = new HashSet<String>();
+        filteredLauncherProcesses.addAll(Arrays.asList(
+                getResources().getStringArray(R.array.filtered_launcher_process_names)));
+
+        mLauncherProcessNames = new HashSet<String>();
+        // Use an Launcher intent to resolve all Activities that can be launched from home.
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> resolveInfoList = mPackageManager.queryIntentActivities(intent, 0);
+
+        // Translate resolveInfo to packageName, then to appInfo, then to processName.
+        for(ResolveInfo resolveInfo : resolveInfoList) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            try {
+                ApplicationInfo appInfo = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+                if (!filteredLauncherProcesses.contains(appInfo.processName))
+                    mLauncherProcessNames.add(appInfo.processName);
+            }
+            catch (PackageManager.NameNotFoundException e) {
+                Log.e(TAG, e.toString());
+            }
         }
 
-        // Initialize the app usage Hashmap. Load today's usage data from database.
-        readDataFromDatabase();
+        System.out.println("Launcher Process Names: ");
+        for (String processName : mLauncherProcessNames) {
+            System.out.println(processName);
+        }
     }
 
 
@@ -260,24 +290,26 @@ public class TrackService extends Service{
                 continue;
 
             // Get the package info of this process
-            String packageName = appProcessInfo.processName;
+            String processName = appProcessInfo.processName;
+
+            // If the first non-service foreground process is not a launcher app, then we are most
+            // likely in the launcher itself, or the settings page. Break in here.
+            // See populateLauncherProcessNames() for more details.
+            if(! mLauncherProcessNames.contains(processName))
+                break;
+
             PackageInfo packageInfo;
             try {
-                packageInfo = mPackageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+                packageInfo = mPackageManager.getPackageInfo(processName, PackageManager.GET_ACTIVITIES);
             }
             catch (PackageManager.NameNotFoundException e) {
                 continue;
             }
 
-            // If the first process is system process, then we are probably not opening an app. Break here.
-            // Examples include com.android.launcher and com.android.settings
-            if(isFilteredSystemPackage(packageInfo))
-                break;
 
-            // We have found a foreground app that's not system process.
-            // It's probably the app user is using right now. Add it to the app usage info.
-            if ( mAppUsageInfo.containsKey(packageName) ) {
-                AppUsageEntry entry = mAppUsageInfo.get(packageName);
+            // We have found a foreground launcher app. Update usage info now.
+            if ( mAppUsageInfo.containsKey(processName) ) {
+                AppUsageEntry entry = mAppUsageInfo.get(processName);
                 entry.UsageTimeSec += (mTimerInterval /1000);
                 entry.Dirty = true;
             }
@@ -285,12 +317,12 @@ public class TrackService extends Service{
                 String appName = packageInfo.applicationInfo.loadLabel(mPackageManager).toString();
                 BitmapDrawable appIcon = (BitmapDrawable) packageInfo.applicationInfo.loadIcon(getPackageManager());
 
-                AppUsageEntry newEntry = new AppUsageEntry(packageName, appName, appIcon.getBitmap(), 1, mCurrentDate);
+                AppUsageEntry newEntry = new AppUsageEntry(processName, appName, appIcon.getBitmap(), 1, mCurrentDate);
                 newEntry.Dirty = true;
-                mAppUsageInfo.put(packageName, newEntry);
+                mAppUsageInfo.put(processName, newEntry);
             }
 
-            // Break after we have caught 1 foreground process.
+            // Break after we found one foreground app.
             break;
         }
     }
@@ -306,18 +338,6 @@ public class TrackService extends Service{
                 appProcessInfo.importanceReasonCode == RunningAppProcessInfo.REASON_SERVICE_IN_USE);
     }
 
-
-    /**
-     * Decide whether the given package is a system package, and if yes, whether it should
-     * be ignored.
-     * @param packageInfo Name of the package.
-     * @return True if packageInfo represents a system package that should be ignored (such as
-     * com.android.systemui). False otherwise.
-     */
-    private boolean isFilteredSystemPackage(PackageInfo packageInfo) {
-        //return ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0)
-        return mFilteredSystemPackagesSet.contains(packageInfo.packageName);
-    }
 
 
     /*--------------------------------------*/

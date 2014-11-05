@@ -13,7 +13,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,7 +22,7 @@ import java.util.Calendar;
 public class MainActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-
+    public static final String TAG = "MainActivity";
     // Navigation Drawer
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private Fragment mCurrentSectionFragment;
@@ -36,7 +35,7 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int selectedDrawerItem = 0;
+        int selectedDrawerItem;
 
         Intent startIntent = getIntent();
         selectedDrawerItem = startIntent.getIntExtra("SelectDrawerItem", 0);
@@ -54,7 +53,7 @@ public class MainActivity extends Activity
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-        mNavigationDrawerFragment.setCurrentSelectedPosition(selectedDrawerItem);
+        mNavigationDrawerFragment.selectItem(selectedDrawerItem);
 
         setNotificationForSurvey();
     }
@@ -145,7 +144,7 @@ public class MainActivity extends Activity
         for (int i=0; i<3; i++) {
             mCalendar = Calendar.getInstance();
             mCalendar.set(Calendar.HOUR_OF_DAY, times[i]);
-            mCalendar.set(Calendar.MINUTE, 00);
+            mCalendar.set(Calendar.MINUTE, 0);
             mCalendar.set(Calendar.SECOND, 0);
             mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, 0);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), mPendingIntent);

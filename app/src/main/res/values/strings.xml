@@ -15,16 +15,9 @@
     <string name="app_usage_pick_date" >"DATE RANGE:    "</string>
     <string name="app_usage_pick_limit">"DISPLAY LIMIT: "</string>
     <string name="app_usage_filter_title">FILTERS</string>
-    <string-array name="filtered_system_package_array">
-        <item>com.android.launcher</item>
+    <string-array name="filtered_launcher_process_names">
         <item>com.android.settings</item>
-        <item>com.android.phone</item>
-        <item>com.android.systemui</item>
-        <item>com.android.nfc</item>
-        <item>com.android.</item>
-        <item>com.android.packageinstaller</item>
-        <item>com.android.server.telecom</item>
-        <item>com.nuance.xt9.input</item>
+        <item>com.google.android.gms</item>
     </string-array>
     <string-array name="app_usage_date_range_array">
         <item>Today</item>
