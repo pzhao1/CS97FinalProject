@@ -33,7 +33,8 @@ public class NotificationAlarmService extends Service{
                 new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("MoodTracker")
-                .setContentText("Take MoodTracker Survey!");
+                .setContentText("Take MoodTracker Survey!")
+                .setAutoCancel(true);
         // When user clicks the notification, open MoodTracker survey
         Intent resultIntent = new Intent(this, MainActivity.class);
         resultIntent.putExtra("SelectDrawerItem", 2);
