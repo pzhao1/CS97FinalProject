@@ -82,7 +82,7 @@ public class MainActivity extends FragmentActivity
                 mTitle = getString(R.string.title_section2);
                 break;
             case 2:
-                mCurrentSectionFragment = new SurveyQuestionFragment();
+                mCurrentSectionFragment = new SurveySectionFragment();
                 mTitle = getString(R.string.title_section3);
                 break;
         }

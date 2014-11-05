@@ -4,9 +4,9 @@ package edu.swarthmore.cs.moodtracker;
  * Created by Peng on 10/19/2014.
  */
 
-import android.support.v4.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +19,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.swarthmore.cs.moodtracker.R;
-import edu.swarthmore.cs.moodtracker.TrackService;
 import edu.swarthmore.cs.moodtracker.util.AppUsageEntry;
 import edu.swarthmore.cs.moodtracker.util.AppUsageListAdapter;
 

@@ -63,7 +63,7 @@ public class TakeSurveyActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return new Fragment();
+            return new SurveyQuestionFragment();
         }
 
         @Override
