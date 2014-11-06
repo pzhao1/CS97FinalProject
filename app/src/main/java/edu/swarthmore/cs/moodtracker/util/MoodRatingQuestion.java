@@ -28,6 +28,7 @@ public class MoodRatingQuestion {
         mAnswer = answer;
     }
 
+
     public String getQuestion() {
         return mQuestion;
     }

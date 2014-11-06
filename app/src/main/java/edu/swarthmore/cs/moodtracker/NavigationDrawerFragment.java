@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -98,13 +100,40 @@ public class NavigationDrawerFragment extends Fragment {
         });
         mDrawerListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
+                R.layout.list_item_nav_drawer,
                 android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section_app_usage),
-                        getString(R.string.title_section_text_analysis),
-                        getString(R.string.title_section_surveys),
-                }));
+                new String[]{ getString(R.string.title_section_app_usage), getString(R.string.title_section_text_analysis), getString(R.string.title_section_surveys), }) {
+                   @Override
+                   public View getView(int position, View convertView, ViewGroup parent) {
+                       View view = super.getView(position, convertView, parent);
+
+                       ImageView drawerRowIcon = (ImageView) view.findViewById(R.id.drawer_icon);
+                       Drawable icon;
+                       switch (position) {
+                           case 0:
+                               icon = getResources().getDrawable(R.drawable.icon_drawer_app_usage);
+                               break;
+                           case 1:
+                               icon = getResources().getDrawable(R.drawable.icon_drawer_text_analysis);
+                                drawerRowIcon.setScaleX(0.8f);
+                                drawerRowIcon.setScaleY(0.8f);
+                               break;
+                           case 2:
+                                drawerRowIcon.setScaleX(0.9f);
+                                drawerRowIcon.setScaleY(0.9f);
+                                icon = getResources().getDrawable(R.drawable.icon_drawer_survey);
+                               break;
+                           default:
+                               icon = null;
+                       }
+                       drawerRowIcon.setImageDrawable(icon);
+
+                       return view;
+                   }
+               }
+
+
+        );
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }

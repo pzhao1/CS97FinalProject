@@ -45,7 +45,7 @@ public class TakeSurveyActivity extends FragmentActivity {
         PAGES_MAP = Collections.unmodifiableMap(tmp);
     }
 
-    private static int mNumPages = 1;
+    private int mNumPages = 1;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private HashMap<Integer, Integer> mResults;
@@ -54,9 +54,6 @@ public class TakeSurveyActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_survey);
-
-        // Set title bar
-        setTitle(R.string.survey_questionnaire);
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.viewpager);
@@ -120,6 +117,7 @@ public class TakeSurveyActivity extends FragmentActivity {
     }
 
     public void selectedRating(HashMap<Integer, Integer> results) {
+        invalidateOptionsMenu();
         mResults = results;
 
         int nextPage = mPager.getCurrentItem() + 1;
