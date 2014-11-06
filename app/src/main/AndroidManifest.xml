@@ -32,9 +32,6 @@
             android:name=".NotificationAlarmReceiver">
         </receiver>
 
-        <service android:name=".NotificationAlarmService"
-                 android:enabled="true" />
-
     </application>
 
 
