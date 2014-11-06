@@ -10,7 +10,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
- * Created by cwang3 on 11/3/14.
+ * The service that creates a notification and reminds user to take mood survey.
+ * Started when
  */
 public class NotificationAlarmService extends Service{
 
@@ -19,12 +20,12 @@ public class NotificationAlarmService extends Service{
     @Override
     public IBinder onBind(Intent arg0)
     {
-        Log.d(TAG, "onBind()");
         return null;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, intent.toString());
         super.onStartCommand(intent, flags, startId);
         NotificationManager mNotificationManager;
         PendingIntent mPendingIntent;
@@ -48,7 +49,6 @@ public class NotificationAlarmService extends Service{
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind()");
         return false;
     }
 

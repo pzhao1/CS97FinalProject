@@ -27,10 +27,8 @@
 
         <service android:name=".TrackService" />
 
-
-
         <receiver
-            android:name=".NotificationReceiver">
+            android:name=".NotificationAlarmReceiver">
         </receiver>
 
         <service android:name=".NotificationAlarmService"

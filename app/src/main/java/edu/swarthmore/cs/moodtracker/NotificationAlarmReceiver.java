@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.util.Log;
 
 /**
- * Created by cwang3 on 11/3/14.
+ * When it is time to take surveys, initiate a service that creates the notification.
  */
-public class NotificationReceiver extends BroadcastReceiver {
+public class NotificationAlarmReceiver extends BroadcastReceiver {
     public static final String TAG = "NotificationReceiver";
 
     @Override
@@ -16,5 +16,6 @@ public class NotificationReceiver extends BroadcastReceiver {
         Log.d(TAG, "onReceive called");
         Intent service1 = new Intent(context, NotificationAlarmService.class);
         context.startService(service1);
+        //context.stopService(service1);?? Do I need to stop the service?
     }
 }
