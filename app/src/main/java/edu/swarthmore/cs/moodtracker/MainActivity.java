@@ -163,25 +163,27 @@ public class MainActivity extends FragmentActivity
     }
 
     /**
-     * Show the notifications to remind users to take the survey.
+     * Set notifications to appear three times a day and remind users to take the survey.
      */
     private void setNotificationForSurvey() {
-
         Log.d("setNotificationForSurvey", "called");
         // Set alarm for survey
         Calendar mCalendar;
         PendingIntent mPendingIntent;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        Intent myIntent = new Intent(this, NotificationReceiver.class);
-        int[] times = {9,15,22};
+        Intent myIntent = new Intent(this, NotificationAlarmReceiver.class);
+        int[] times = {9,15,22};    //survey at 9am, 3pm and 10pm
 
         for (int i=0; i<3; i++) {
             mCalendar = Calendar.getInstance();
+            // Avoid sending notification for past time
+            if (times[i]<= mCalendar.get(Calendar.HOUR_OF_DAY)) {
+                mCalendar.add(Calendar.DAY_OF_MONTH, 1);
+            }
             mCalendar.set(Calendar.HOUR_OF_DAY, times[i]);
             mCalendar.set(Calendar.MINUTE, 0);
             mCalendar.set(Calendar.SECOND, 0);
             mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            //mAlarmManager.cancel(mPendingIntent);
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
         }
     }

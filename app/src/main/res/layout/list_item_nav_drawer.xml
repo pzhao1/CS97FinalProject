@@ -5,14 +5,27 @@
     android:layout_height="60dp"
     android:background="@drawable/nav_drawer_item"
     >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-    <TextView
-        style="@style/NavDrawerRow"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"
-        android:id="@android:id/text1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-        />
+        <ImageView
+            android:id="@+id/drawer_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:layout_marginRight="5dp"
+            />
+
+        <TextView
+            style="@style/NavDrawerRow"
+            android:layout_centerVertical="true"
+            android:id="@android:id/text1"
+            android:text="This is a test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
 </RelativeLayout>
