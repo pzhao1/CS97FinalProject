@@ -16,7 +16,6 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -153,7 +152,6 @@ public class TrackService extends Service{
         long newDate = getDaysSinceEpoch();
         if (newDate > mCurrentDate) {
             Log.d(TAG, "newDay");
-            Toast.makeText(this, "newDay", Toast.LENGTH_SHORT).show();
             saveDataToDatabase();
             mCurrentDate = newDate;
 
