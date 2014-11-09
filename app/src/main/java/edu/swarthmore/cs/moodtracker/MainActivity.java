@@ -4,9 +4,12 @@ import android.app.ActionBar;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -16,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.os.Handler;
 
 import java.util.Calendar;
 
@@ -65,6 +69,7 @@ public class MainActivity extends FragmentActivity
         }
 
         setNotificationForSurvey();
+        getTextMessages();
     }
 
     @Override
@@ -186,6 +191,14 @@ public class MainActivity extends FragmentActivity
             mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
         }
+    }
+
+    private void getTextMessages() {
+        //Cursor mCursor = getContentResolver().query(Uri.parse("content://sms/inbox"),null,null,null,null);
+        //mCursor.moveToFirst();
+        ContentResolver contentResolver = getContentResolver();
+        OutgoingTextMsgObserver outgoingTextMsgObserver = new OutgoingTextMsgObserver(new Handler(), this);
+        contentResolver.registerContentObserver(Uri.parse("content://sms"),true, outgoingTextMsgObserver);
     }
 
     /**
