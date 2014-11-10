@@ -41,6 +41,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".getLastDayMsgReceiver">
+        </receiver>
+
     </application>
 
 
