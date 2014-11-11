@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS"></uses-permission>
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS"></uses-permission>
 
     <application
         android:allowBackup="true"
@@ -30,6 +33,16 @@
 
         <receiver
             android:name=".NotificationAlarmReceiver">
+        </receiver>
+
+        <receiver android:name=".TextMsgReceiver">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".getLastDayMsgReceiver">
         </receiver>
 
     </application>

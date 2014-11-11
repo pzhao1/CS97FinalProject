@@ -4,9 +4,11 @@ import android.app.ActionBar;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.os.Handler;
 
 import java.util.Calendar;
 
@@ -65,6 +68,9 @@ public class MainActivity extends FragmentActivity
         }
 
         setNotificationForSurvey();
+        // I think we only need to choose one of these two:
+        trackTextMessages();
+        getWholeDayMessages();
     }
 
     @Override
@@ -186,6 +192,36 @@ public class MainActivity extends FragmentActivity
             mPendingIntent = PendingIntent.getBroadcast(this, i, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
         }
+    }
+
+    /**
+     * Set up tracking of incoming and outgoing messages.
+     */
+    private void trackTextMessages() {
+        //Cursor mCursor = getContentResolver().query(Uri.parse("content://sms/inbox"),null,null,null,null);
+        //mCursor.moveToFirst();
+        ContentResolver contentResolver = getContentResolver();
+        OutgoingTextMsgObserver outgoingTextMsgObserver = new OutgoingTextMsgObserver(new Handler(), this);
+        contentResolver.registerContentObserver(Uri.parse("content://sms"), true, outgoingTextMsgObserver);
+    }
+
+    /**
+     * Collect an entire day of messages at 00:01:00 the next day
+     */
+    private void getWholeDayMessages() {
+        PendingIntent mPendingIntent;
+        AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        Intent myIntent = new Intent(this, getLastDayMsgReceiver.class);
+        mPendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
+        Calendar mCalendar = Calendar.getInstance();
+        if (mCalendar.get(Calendar.HOUR_OF_DAY)>=0 && mCalendar.get(Calendar.MINUTE)>=1) {
+            mCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        mCalendar.set(Calendar.HOUR_OF_DAY,00);
+        mCalendar.set(Calendar.MINUTE,01);
+        mCalendar.set(Calendar.SECOND,00);
+        mAlarmManager.setRepeating(AlarmManager.RTC, mCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
+
     }
 
     /**
