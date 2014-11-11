@@ -1,4 +1,6 @@
-package edu.swarthmore.cs.moodtracker.util;
+package edu.swarthmore.cs.moodtracker.db;
+
+import edu.swarthmore.cs.moodtracker.util.StringEncodeUtil;
 
 /**
  * Created by rliang on 11/3/14.

@@ -1,4 +1,4 @@
-package edu.swarthmore.cs.moodtracker.util;
+package edu.swarthmore.cs.moodtracker.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-import edu.swarthmore.cs.moodtracker.util.TrackContract.AppInfoSchema;
-import edu.swarthmore.cs.moodtracker.util.TrackContract.AppUsageSchema;
-import edu.swarthmore.cs.moodtracker.util.TrackContract.SurveyInfoSchema;
+import edu.swarthmore.cs.moodtracker.db.TrackContract.AppInfoSchema;
+import edu.swarthmore.cs.moodtracker.db.TrackContract.AppUsageSchema;
+import edu.swarthmore.cs.moodtracker.db.TrackContract.SurveyInfoSchema;
 
 /**
  * Created by Peng on 10/19/2014.

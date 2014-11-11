@@ -1,4 +1,4 @@
-package edu.swarthmore.cs.moodtracker.util;
+package edu.swarthmore.cs.moodtracker.db;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;

@@ -1,4 +1,4 @@
-package edu.swarthmore.cs.moodtracker;
+package edu.swarthmore.cs.moodtracker.services;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -24,8 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
 
-import edu.swarthmore.cs.moodtracker.util.AppUsageEntry;
-import edu.swarthmore.cs.moodtracker.util.TrackDatabase;
+import edu.swarthmore.cs.moodtracker.R;
+import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
+import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 
 /**
  * The service that tracks various stats on the phone, such as app usage, movement, text, voice, etc.
@@ -68,7 +69,7 @@ public class TrackService extends Service{
      */
     public class TrackBinder extends Binder {
         // Return this instance of LocalService so clients can call public methods
-        TrackService getService() {
+        public TrackService getService() {
             return TrackService.this;
         }
     }

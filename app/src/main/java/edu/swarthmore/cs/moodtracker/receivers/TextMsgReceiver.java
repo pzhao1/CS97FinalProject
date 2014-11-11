@@ -1,4 +1,4 @@
-package edu.swarthmore.cs.moodtracker;
+package edu.swarthmore.cs.moodtracker.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

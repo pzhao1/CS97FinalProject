@@ -19,7 +19,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.swarthmore.cs.moodtracker.util.AppUsageEntry;
+import edu.swarthmore.cs.moodtracker.services.TrackService;
+import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
 import edu.swarthmore.cs.moodtracker.util.AppUsageListAdapter;
 
 /**

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.swarthmore.cs.moodtracker.R;
+import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
 
 /**
  * Created by Peng on 10/19/2014.

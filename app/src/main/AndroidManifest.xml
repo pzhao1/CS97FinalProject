@@ -29,20 +29,20 @@
             android:label="@string/take_survey_text"
         />
 
-        <service android:name=".TrackService" />
+        <service android:name=".services.TrackService" />
 
         <receiver
-            android:name=".NotificationAlarmReceiver">
+            android:name=".receivers.NotificationAlarmReceiver">
         </receiver>
 
-        <receiver android:name=".TextMsgReceiver">
+        <receiver android:name=".receivers.TextMsgReceiver">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
 
         <receiver
-            android:name=".getLastDayMsgReceiver">
+            android:name=".receivers.getLastDayMsgReceiver">
         </receiver>
 
     </application>

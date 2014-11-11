@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import edu.swarthmore.cs.moodtracker.util.MoodRatingQuestion;
+import edu.swarthmore.cs.moodtracker.db.MoodRatingQuestion;
 
 
 /**
