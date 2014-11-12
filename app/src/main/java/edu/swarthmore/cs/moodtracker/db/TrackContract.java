@@ -33,7 +33,6 @@ public class TrackContract {
     /* Inner class that defines the survey answers table schema*/
     public static abstract class SurveyInfoSchema implements BaseColumns {
         public static final String TABLE_NAME = "SurveyInfo";
-        public static final String COLUMN_SURVEY_NUMBER = "survey_number";
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_QUESTIONS_ANSWERS = "questions_answers";
     }

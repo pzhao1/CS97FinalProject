@@ -9,12 +9,16 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.swarthmore.cs.moodtracker.db.MoodRatingQuestion;
+import edu.swarthmore.cs.moodtracker.db.SurveyEntry;
+import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 
 
 /**
@@ -69,6 +73,20 @@ public class TakeSurveyActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+        } else if (item.getItemId() == R.id.action_done) {
+            Date date = new Date();
+            int surveyNumber = 1; //TODO: Change
+
+            ArrayList<MoodRatingQuestion> questions = new ArrayList<MoodRatingQuestion>(10);
+            for (int pageNumber : mResults.keySet()) {
+                MoodRatingQuestion question = new MoodRatingQuestion(TakeSurveyActivity.PAGES_MAP.get(pageNumber), mResults.get(pageNumber));
+                questions.add(question);
+            }
+
+            SurveyEntry entry = new SurveyEntry(date, questions);
+            TrackDatabase db = TrackDatabase.getInstance(this);
+            db.writeSurveyEntry(entry);
+
         }
 
         return true;

@@ -22,14 +22,13 @@ public class MoodRatingQuestion {
 
     public static MoodRatingQuestion questionFromDBString(String encodedString) {
         String[] decodedInfo = StringEncodeUtil.decode(encodedString);
-        return new MoodRatingQuestion(decodedInfo[1], new Integer(decodedInfo[2]));
+        return new MoodRatingQuestion(decodedInfo[0], new Integer(decodedInfo[1]));
     }
 
     public MoodRatingQuestion(String question, int answer) {
         mQuestion = question;
         mAnswer = answer;
     }
-
 
     public String getQuestion() {
         return mQuestion;
