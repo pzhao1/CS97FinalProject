@@ -87,8 +87,9 @@ public class TrackDatabase extends SQLiteOpenHelper {
         String CREATE_TEXT_MSG_TABLE = "CREATE TABLE " + TextMsgInfoSchema.TABLE_NAME + "("
                 + TextMsgInfoSchema.COLUMN_ID + " INTEGER, "
                 + TextMsgInfoSchema.COLUMN_DATE + " INTEGER, "
-                + TextMsgInfoSchema.COLUMN_SENDER + " INTEGER, "
-                + TextMsgInfoSchema.COLUMN_RECEIVER + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_SENDER + " Text, "
+                + TextMsgInfoSchema.COLUMN_RECEIVER + " Text, "
+                + TextMsgInfoSchema.COLUMN_TYPE + " INTEGER, "
                 + TextMsgInfoSchema.COLUMN_MESSAGE + " Text, "
                 + "PRIMARY KEY (" + TextMsgInfoSchema.COLUMN_ID + ", " + TextMsgInfoSchema.COLUMN_DATE + ")"
                 + ")";
@@ -226,8 +227,8 @@ public class TrackDatabase extends SQLiteOpenHelper {
     /**
      * Write a TextMsg entry into the database.
      */
-    public void writeTextMsgRecord (Integer id, Integer date, Integer sender, Integer receiver,
-                                    String message) {
+    public void writeTextMsgRecord (Integer id, Long date, String sender, String receiver,
+                                    Integer type,String message) {
         Log.d(TAG, "in writeTextMsgRecord");
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -236,6 +237,7 @@ public class TrackDatabase extends SQLiteOpenHelper {
         textMsgValues.put(TextMsgInfoSchema.COLUMN_DATE, date);
         textMsgValues.put(TextMsgInfoSchema.COLUMN_SENDER, sender);
         textMsgValues.put(TextMsgInfoSchema.COLUMN_RECEIVER, receiver);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_TYPE,type);
         textMsgValues.put(TextMsgInfoSchema.COLUMN_MESSAGE, message);
         db.insert(TextMsgInfoSchema.TABLE_NAME, null, textMsgValues);
         db.close();

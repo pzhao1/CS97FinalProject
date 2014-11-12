@@ -44,6 +44,7 @@ public class TrackContract {
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_SENDER = "sender";
         public static final String COLUMN_RECEIVER = "receiver";
+        public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_MESSAGE = "message";
     }
 }

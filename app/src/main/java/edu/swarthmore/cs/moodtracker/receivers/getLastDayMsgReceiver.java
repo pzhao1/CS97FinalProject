@@ -36,17 +36,24 @@ public class getLastDayMsgReceiver extends BroadcastReceiver {
                 "date >= " + start,
                 null,
                 null);
+
         Log.d(TAG, "cursor created");
         if (cur != null) {
             if (cur.moveToFirst()) {
                 do {
+                    for (int i=0; i < cur.getColumnCount(); i++) {
+                        String name = cur.getColumnName(i);
+                        int type = cur.getType(i);
+                        System.out.println(name + " : " + type);
+                    }
                     Integer id = cur.getInt(cur.getColumnIndex("_id"));
-                    Integer date = cur.getInt(cur.getColumnIndex("date"));
-                    Integer sender = cur.getInt(cur.getColumnIndex("person"));
-                    Integer receiver = cur.getInt(cur.getColumnIndex("address"));
+                    Long date = cur.getLong(cur.getColumnIndex("date"));
+                    String sender = cur.getString(cur.getColumnIndex("person"));
+                    String receiver = cur.getString(cur.getColumnIndex("address"));
                     String message = cur.getString(cur.getColumnIndex("body"));
+                    Integer type = cur.getInt(cur.getColumnIndex("type"));
                     Log.d(TAG, message);
-                    mDatabase.writeTextMsgRecord(id, date, sender, receiver,message);
+                    mDatabase.writeTextMsgRecord(id, date, sender, receiver, type, message);
                 } while (cur.moveToNext());
             }
         }
