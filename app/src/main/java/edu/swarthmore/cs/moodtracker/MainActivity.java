@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -18,7 +19,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.os.Handler;
 
 import java.util.Calendar;
 
@@ -60,15 +60,10 @@ public class MainActivity extends FragmentActivity
         mTitle = getTitle();
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        // State management.
+        // Handles state preservation during rotation, and redirection from notification.
         if (savedInstanceState != null) {
-            // If we have a non-null savedInstanceState, then either user rotated screen, or the activity
-            // was on background for too long and system destroyed it to free memory. In this case,
-            // select the section that user selected last time.
             mSelectedSection = savedInstanceState.getInt(EXTRA_DRAWER_SELECT, 0);
         } else {
-            // If we started from notification, then the intent will contain a "SelectDrawerItem" extra
-            // that points to the survey section. Select it. Otherwise, select 0.
             mSelectedSection = getIntent().getIntExtra(EXTRA_DRAWER_SELECT, 0);
         }
 
@@ -147,6 +142,8 @@ public class MainActivity extends FragmentActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

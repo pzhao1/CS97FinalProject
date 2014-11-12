@@ -22,11 +22,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.TimeZone;
 
 import edu.swarthmore.cs.moodtracker.R;
 import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
+import edu.swarthmore.cs.moodtracker.db.ReadAppUsageTask;
+import edu.swarthmore.cs.moodtracker.db.SaveAppUsageTask;
 import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
+import edu.swarthmore.cs.moodtracker.util.TrackDateUtil;
 
 /**
  * The service that tracks various stats on the phone, such as app usage, movement, text, voice, etc.
@@ -48,15 +50,13 @@ public class TrackService extends Service{
     private final int mTimerInterval = 1000;
     private final int mSaveInterval = 60;
     private int mSaveTicks = 0;
-    private TimeZone mMyTimeZone = TimeZone.getDefault();
-    private long mCurrentDate = getDaysSinceEpoch();
+    private long mCurrentDate = TrackDateUtil.getDaysSinceEpoch();
 
     /* App Usage Tracking Variables */
     private ActivityManager mActivityManager = null;
     private PackageManager mPackageManager = null;
     private HashSet<String> mLauncherProcessNames = null;
     private HashMap<String, AppUsageEntry> mAppUsageInfo = null;
-
 
 
     /*----------------------------*/
@@ -83,7 +83,7 @@ public class TrackService extends Service{
         initializeAppUsageTracking();
         initializeTimer();
         registerBroadcastReceiver();
-        mTimerCallback.run();
+        //mTimerCallback.run();
     }
 
     @Override
@@ -150,25 +150,15 @@ public class TrackService extends Service{
      * and initialize today's data.
      */
     private void checkForNewDay() {
-        long newDate = getDaysSinceEpoch();
+        long newDate = TrackDateUtil.getDaysSinceEpoch();
         if (newDate > mCurrentDate) {
             Log.d(TAG, "newDay");
             saveDataToDatabase();
             mCurrentDate = newDate;
 
-            // Load today's usage data from database.
-            readDataFromDatabase();
+            // Renew app usage info map.
+            mAppUsageInfo = new HashMap<String, AppUsageEntry>();
         }
-    }
-
-    /**
-     * Get the number of days passed since Epoch (1970/1/1). This is the date formate stored in database.
-     * @return a long representing the number of days since epoch.
-     */
-    private long getDaysSinceEpoch() {
-        long offset = mMyTimeZone.getOffset(System.currentTimeMillis());
-        long millis = System.currentTimeMillis() + offset;
-        return millis / (24*3600*1000);
     }
 
     /**
@@ -176,28 +166,15 @@ public class TrackService extends Service{
      * Called in onUnbind() and onDestroy().
      */
     public void saveDataToDatabase() {
-        Log.d(TAG, "Saving app usage to database");
-        for (AppUsageEntry entry : mAppUsageInfo.values()) {
-            if (entry.Dirty) {
-                mDatabase.writeAppUsage(entry);
-                entry.Dirty = false;
-            }
-        }
         mSaveTicks = 0;
+        new SaveAppUsageTask(this, mAppUsageInfo.values()) {
+            @Override
+            public void onFinish() {
+                Log.d(TAG, "App usage saved to database");
+            }
+        }.execute();
     }
 
-
-    /**
-     * Load data from TrackDatabase and update member variables.
-     */
-    private void readDataFromDatabase() {
-        Log.d(TAG, "Loading app usage from database");
-        mAppUsageInfo = new HashMap<String, AppUsageEntry>();
-        ArrayList<AppUsageEntry> existingEntries = mDatabase.readAppUsage(mCurrentDate, mCurrentDate);
-        for (AppUsageEntry entry:existingEntries) {
-            mAppUsageInfo.put(entry.PackageName, entry);
-        }
-    }
 
     /*----------------------------*/
     /* App Usage Specific Methods */
@@ -208,16 +185,10 @@ public class TrackService extends Service{
      * This involves database query and is best
      * @return A collection of AppUsageEntry objects.
      */
-    public List<AppUsageEntry> getAppUsageInfo(int dateRange) {
-        if (dateRange == 0)
-            return new ArrayList<AppUsageEntry>(mAppUsageInfo.values());
-        else {
-            saveDataToDatabase();
-            if (dateRange < 0)
-                return mDatabase.readAppUsage(-1, mCurrentDate);
-            else
-                return mDatabase.readAppUsage(mCurrentDate-dateRange, mCurrentDate);
-        }
+    public List<AppUsageEntry> getTodayAppUsage() {
+        if (mAppUsageInfo == null)
+            return null;
+        return new ArrayList<AppUsageEntry>(mAppUsageInfo.values());
     }
 
 
@@ -228,8 +199,22 @@ public class TrackService extends Service{
         // Construct activity manager and package manager.
         mActivityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         mPackageManager = getPackageManager();
+
+        // Construct the launcher app filter
         populateLauncherProcessNames();
-        readDataFromDatabase();
+
+        // Read existing usage entries from database (asynchronously).
+        mAppUsageInfo = new HashMap<String, AppUsageEntry>();
+        new ReadAppUsageTask(this) {
+            @Override
+            public void onFinish(List<AppUsageEntry> result) {
+                Log.d(TAG, "Loaded app usage from database");
+                for (AppUsageEntry entry:result) {
+                    mAppUsageInfo.put(entry.PackageName, entry);
+                }
+                mTimerCallback.run();
+            }
+        }.execute(mCurrentDate, mCurrentDate);
     }
 
     /**
@@ -305,14 +290,13 @@ public class TrackService extends Service{
             if ( mAppUsageInfo.containsKey(processName) ) {
                 AppUsageEntry entry = mAppUsageInfo.get(processName);
                 entry.UsageTimeSec += (mTimerInterval /1000);
-                entry.Dirty = true;
             }
             else {
                 String appName = packageInfo.applicationInfo.loadLabel(mPackageManager).toString();
                 BitmapDrawable appIcon = (BitmapDrawable) packageInfo.applicationInfo.loadIcon(getPackageManager());
 
                 AppUsageEntry newEntry = new AppUsageEntry(processName, appName, appIcon.getBitmap(), 1, mCurrentDate);
-                newEntry.Dirty = true;
+
                 mAppUsageInfo.put(processName, newEntry);
             }
 

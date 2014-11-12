@@ -4,10 +4,11 @@
 
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
-    <uses-permission android:name="android.permission.SEND_SMS"></uses-permission>
-
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -26,8 +27,11 @@
 
         <activity
             android:name=".TakeSurveyActivity"
-            android:label="@string/take_survey_text"
-        />
+            android:label="@string/take_survey_text" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/action_settings" />
 
         <service android:name=".services.TrackService" />
 

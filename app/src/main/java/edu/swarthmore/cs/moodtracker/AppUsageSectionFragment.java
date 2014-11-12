@@ -4,7 +4,6 @@ package edu.swarthmore.cs.moodtracker;
  * Created by Peng on 10/19/2014.
  */
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,13 +14,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import edu.swarthmore.cs.moodtracker.services.TrackService;
 import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
+import edu.swarthmore.cs.moodtracker.db.ReadAppUsageTask;
+import edu.swarthmore.cs.moodtracker.services.TrackService;
 import edu.swarthmore.cs.moodtracker.util.AppUsageListAdapter;
+import edu.swarthmore.cs.moodtracker.util.TrackDateUtil;
 
 /**
  * Created by Peng on 10/19/2014.
@@ -133,8 +132,24 @@ public class AppUsageSectionFragment extends Fragment {
         if (!allInitialized())
             return;
 
-        // Usage AsyncTask to update app usage, because it involves a database query.
-        new UpdateAppUsageTask().execute(mDateRange);
+        // Read app usage from database (asynchronously) and use result to update usage list.
+        long currentDate = TrackDateUtil.getDaysSinceEpoch();
+        new ReadAppUsageTask(getActivity(), mService) {
+            @Override
+            public void onFinish(List<AppUsageEntry> result) {
+                if (result != null) {
+                    AppUsageListAdapter adapter = (AppUsageListAdapter) mAppUsageListView.getAdapter();
+                    if (adapter != null) {
+                        adapter.clear();
+                        adapter.addAll(result);
+                    } else {
+                        adapter = new AppUsageListAdapter(
+                                getActivity(), R.layout.list_item_app_usage, result);
+                        mAppUsageListView.setAdapter(adapter);
+                    }
+                }
+            }
+        }.execute(currentDate - mDateRange, currentDate, (long)mDisplayLimit);
     }
 
     /**
@@ -185,17 +200,6 @@ public class AppUsageSectionFragment extends Fragment {
     /*-----------------------*/
 
     /**
-     * Comparator for two AppUsageEntries. Used in sorting the list.
-     */
-    private class AppUsageEntryComparator implements Comparator<AppUsageEntry> {
-        @Override
-        public int compare(AppUsageEntry entry1, AppUsageEntry entry2)
-        {
-            return  (entry2.UsageTimeSec - entry1.UsageTimeSec);
-        }
-    }
-
-    /**
      * Selector for date range spinner.
      */
     private class DateRangeSpinnerListener implements AdapterView.OnItemSelectedListener {
@@ -227,45 +231,5 @@ public class AppUsageSectionFragment extends Fragment {
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) { }
-    }
-
-    /**
-     * The AsyncTask that handles getting app usage information from TrackService, which involves
-     * database queryies and could potentially be slow.
-     */
-    private class UpdateAppUsageTask extends AsyncTask<Integer, Integer, List<AppUsageEntry> > {
-        protected List<AppUsageEntry> doInBackground(Integer... params) {
-            if (params.length > 0) {
-
-                // Query, sort, and apply display limit to app usage list.
-                List<AppUsageEntry> result = mService.getAppUsageInfo(params[0]);
-                Collections.sort(result, new AppUsageEntryComparator());
-                if (mDisplayLimit >= 0 && mDisplayLimit < result.size()) {
-                    result = result.subList(0, mDisplayLimit);
-                }
-                return result;
-            }
-            else
-                return null;
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-
-        }
-
-        protected void onPostExecute( List<AppUsageEntry> result) {
-            if (result != null) {
-                AppUsageListAdapter adapter = (AppUsageListAdapter) mAppUsageListView.getAdapter();
-                if (adapter != null) {
-                    adapter.clear();
-                    adapter.addAll(result);
-                }
-                else {
-                    adapter = new AppUsageListAdapter(
-                            getActivity(), R.layout.list_item_app_usage, result);
-                    mAppUsageListView.setAdapter(adapter);
-                }
-            }
-        }
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- General purpose strings -->
     <string name="app_name">Mood Tracker</string>
     <string name="title_section_app_usage">App Usage</string>
     <string name="title_section_text_analysis">Text Analysis</string>
@@ -9,6 +10,13 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
+
+    <!-- Strings for settings activity -->
+    <string name="pref_sync_category_title">Sync App Categories</string>
+    <string name="pref_sync_category_summary">When connected to wi-fi, click to sync app categories from Android Market.</string>
+    <string name="pref_sync_category_summary_disable">All app categories synced. No need to sync before using new apps.</string>
+    <string name="pref_export_data_title">Export Data</string>
+    <string name="pref_export_data_summary">Click to save tracking data to json files in public storage.</string>
 
     <!-- Strings for survey section -->
     <string name="survey_questionnaire">Take Survey</string>
@@ -20,7 +28,6 @@
     <string name="app_usage_pick_date">"DATE RANGE:    "</string>
     <string name="app_usage_pick_limit">"DISPLAY LIMIT: "</string>
     <string name="app_usage_filter_title">FILTERS</string>
-
     <string-array name="filtered_launcher_process_names">
         <item>com.android.settings</item>
         <item>com.google.android.gms</item>

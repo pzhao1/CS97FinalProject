@@ -93,6 +93,58 @@ public class TrackDatabase extends SQLiteOpenHelper {
     }
 
     /**
+     * Retrieve app usage entries from database satisfying certain conditions.
+     * @param startDate Earliest date to include in query. Pass in -1 to start from beginning
+     * @param endDate Latest date to include in query. Pass in -1 to end at today.
+     * @return A list of app usage entries satisfying the given condition.
+     */
+    public ArrayList<AppUsageEntry> readAppUsage(long startDate, long endDate) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Use a raw query to query appInfoTable and appUsageTable at the same time.
+        // Specify selections.
+        String selections = " ";
+        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE + ", ";
+        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_NAME + ", ";
+        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_ICON + ", ";
+        //selections += "SUM(" + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_USAGE_SEC + ")" +
+        //        " AS " + AppUsageSchema.COLUMN_USAGE_SEC + ", ";
+        selections += AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_USAGE_SEC + ", ";
+        selections += AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " ";
+
+        // Specify Tables ("FROM" clause).
+        String tables = " " + AppInfoSchema.TABLE_NAME + ", " + AppUsageSchema.TABLE_NAME + " ";
+
+        // Specify conditions ("WHERE" clause)
+        String conditions = " ";
+        conditions += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE +
+                " = " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_PACKAGE;
+        if (startDate > 0)
+            conditions += " AND " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " >= " + startDate;
+        if (endDate > 0)
+            conditions += " AND " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " <= " + endDate + " ";
+
+        // Specify "GROUP BY" clause
+        //String groupBy =  " " + AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE + " ";
+
+        // Construct raw query.
+        String rawQuery = "SELECT" + selections + "FROM" + tables + "WHERE" + conditions; // + "GROUP BY" + groupBy;
+
+        // Query the database to get a cursor
+        Cursor cursor = db.rawQuery(rawQuery, null);
+
+        ArrayList<AppUsageEntry> result = new ArrayList<AppUsageEntry>();
+        if (cursor.moveToFirst()){
+            for (int i=0; i<cursor.getCount(); i++){
+                result.add(new AppUsageEntry(cursor));
+            }
+        }
+
+        db.close();
+        return result;
+    }
+
+    /**
      * Write an AppUsage entry into the database, overwriting any existing entries.
      * @param entry The AppUsage entry that we write into the database.
      */
@@ -114,53 +166,5 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.insertWithOnConflict(AppUsageSchema.TABLE_NAME, null, appUsageValues, SQLiteDatabase.CONFLICT_REPLACE);
 
         db.close();
-    }
-
-    /**
-     * Retrieve app usage entries from database satisfying certain conditions.
-     * @param date Date of the app usage entries to retrieve, expressed in number of days
-     *             from Epoch (midnight of 1970-1-1 GMT).
-     * @return A list of app usage entries satisfying the given condition.
-     */
-    public ArrayList<AppUsageEntry> readAppUsage(long startDate, long endDate) {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        // Use a raw query to query appInfoTable and appUsageTable at the same time.
-        String selections = " ";
-        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE + ", ";
-        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_NAME + ", ";
-        selections += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_APP_ICON + ", ";
-        selections += "SUM(" + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_USAGE_SEC + ")" +
-                " AS " + AppUsageSchema.COLUMN_USAGE_SEC + ", ";
-        selections += AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " ";
-
-        String tables = " " + AppInfoSchema.TABLE_NAME + ", " + AppUsageSchema.TABLE_NAME + " ";
-
-        String conditions = " ";
-        conditions += AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE +
-                " = " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_PACKAGE;
-        if (startDate > 0)
-            conditions += " AND " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " >= " + startDate;
-        if (endDate > 0)
-            conditions += " AND " + AppUsageSchema.TABLE_NAME + "." + AppUsageSchema.COLUMN_DATE + " <= " + endDate + " ";
-
-        String groupBy =  " " + AppInfoSchema.TABLE_NAME + "." + AppInfoSchema.COLUMN_PACKAGE + " ";
-
-        String rawQuery = "SELECT" + selections + "FROM" + tables + "WHERE" + conditions + "GROUP BY" + groupBy;
-
-        // Query the database to get a cursor
-        Cursor cursor = db.rawQuery(rawQuery, null);
-
-        // Retrieve app usage entries from cursor and return it.
-        ArrayList <AppUsageEntry> entries = new ArrayList<AppUsageEntry>();
-        if (cursor.moveToFirst()){
-            int numApps = cursor.getCount();
-            for (int i=0; i<numApps; i++){
-                entries.add(new AppUsageEntry(cursor));
-            }
-        }
-
-        db.close();
-        return entries;
     }
 }

@@ -3,7 +3,11 @@ package edu.swarthmore.cs.moodtracker.db;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 
@@ -13,26 +17,28 @@ import java.io.ByteArrayOutputStream;
  */
 public class AppUsageEntry {
     public static final String TAG = "AppUsageEntry";
+    public static final String JSON_PACKAGE_NAME = "package_name";
+    public static final String JSON_APP_NAME = "app_name";
+    public static final String JSON_APP_ICON = "app_icon";
+    public static final String JSON_USAGE = "usage_time_sec";
+    public static final String JSON_DATE = "days_since_epoch";
 
-    public String PackageName = "";
-    public int UsageTimeSec = 0;
-    public String AppName = "";
+    public String PackageName = null;
+    public String AppName = null;
     public Bitmap AppIcon = null;
-    public long DaysSinceEpoch = 0;
-    public boolean Dirty = false;
+    public int UsageTimeSec = -1;
+    public long DaysSinceEpoch = -1;
+
 
     /**
-     * Construct an AppUsageEntry using given information.
-     * @param packageName Package name of the app.
-     * @param appName Name of the app.
-     * @param usageTimeSec Usage time of the app in seconds.
+     * Construct an empty AppUsageEntry
      */
-    public AppUsageEntry(String packageName, String appName, Bitmap icon, int usageTimeSec, long daysSinceEpoch){
-        this.PackageName = packageName;
+    public AppUsageEntry(String pkgName, String appName, Bitmap appIcon, int usage, long date) {
+        this.PackageName = pkgName;
         this.AppName = appName;
-        this.UsageTimeSec = usageTimeSec;
-        this.AppIcon = icon;
-        this.DaysSinceEpoch = daysSinceEpoch;
+        this.AppIcon = appIcon;
+        this.UsageTimeSec = usage;
+        this.DaysSinceEpoch = date;
     }
 
     /**
@@ -43,7 +49,7 @@ public class AppUsageEntry {
      */
     public AppUsageEntry(Cursor cursor){
         // Keep default values if cursor is already finished reading.
-        if (cursor.isAfterLast()){
+        if (cursor.isAfterLast()) {
             return;
         }
 
@@ -61,7 +67,7 @@ public class AppUsageEntry {
         else
             Log.e(TAG, "AppUsageEntry(Cursor): COLUMN_APP_NAME not found");
 
-        // Get the App Name column
+        // Get the App Icon column
         index = cursor.getColumnIndex(TrackContract.AppInfoSchema.COLUMN_APP_ICON);
         if (index >= 0)
             this.populateIconFromByteArray(cursor.getBlob(index));
@@ -84,6 +90,31 @@ public class AppUsageEntry {
 
         cursor.moveToNext();
     }
+
+
+    /**
+     * Converts class to a JSON object. Used for storage.
+     * @return The JSON representation of this class.
+     */
+    public JSONObject toJSON() {
+        try {
+            JSONObject jsonObj = new JSONObject();
+            jsonObj.put(JSON_PACKAGE_NAME, PackageName);
+            jsonObj.put(JSON_APP_NAME, AppName);
+
+            byte[] bytes = getIconInByteArray();
+            String iconEncodedString = Base64.encodeToString(bytes, Base64.DEFAULT);
+            jsonObj.put(JSON_APP_ICON, iconEncodedString);
+
+            jsonObj.put(JSON_USAGE, UsageTimeSec);
+            jsonObj.put(JSON_DATE, DaysSinceEpoch);
+            return jsonObj;
+        }
+        catch (JSONException e) {
+            return null;
+        }
+    }
+
 
     /**
      * Converts the icon of this app usage entry to a byte array. Used in database storage.
