@@ -216,9 +216,9 @@ public class MainActivity extends FragmentActivity
         Intent myIntent = new Intent(this, getLastDayMsgReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
         Calendar mCalendar = Calendar.getInstance();
-        if (mCalendar.get(Calendar.HOUR_OF_DAY)>=0 && mCalendar.get(Calendar.MINUTE)>=1) {
-            mCalendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
+        //if (mCalendar.get(Calendar.HOUR_OF_DAY)>=0 && mCalendar.get(Calendar.MINUTE)>=1) {
+        //    mCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        //}
         mCalendar.set(Calendar.HOUR_OF_DAY,00);
         mCalendar.set(Calendar.MINUTE,01);
         mCalendar.set(Calendar.SECOND,00);

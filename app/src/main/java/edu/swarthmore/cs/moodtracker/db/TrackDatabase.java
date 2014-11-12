@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppInfoSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppUsageSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.SurveyInfoSchema;
+import edu.swarthmore.cs.moodtracker.db.TrackContract.TextMsgInfoSchema;
 
 /**
  * Created by Peng on 10/19/2014.
@@ -74,11 +76,23 @@ public class TrackDatabase extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_APP_INFO_TABLE);
 
+
         String CREATE_SURVEY_INFO_TABLE = "CREATE TABLE " + SurveyInfoSchema.TABLE_NAME + "("
                 + SurveyInfoSchema.COLUMN_DATE + " INTEGER PRIMARY KEY, "
                 + SurveyInfoSchema.COLUMN_QUESTIONS_ANSWERS + " Text"
                 + ")";
         db.execSQL(CREATE_SURVEY_INFO_TABLE);
+
+        // Create the TextMsgInfo table
+        String CREATE_TEXT_MSG_TABLE = "CREATE TABLE " + TextMsgInfoSchema.TABLE_NAME + "("
+                + TextMsgInfoSchema.COLUMN_ID + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_DATE + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_SENDER + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_RECEIVER + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_MESSAGE + " Text, "
+                + "PRIMARY KEY (" + TextMsgInfoSchema.COLUMN_ID + ", " + TextMsgInfoSchema.COLUMN_DATE + ")"
+                + ")";
+        db.execSQL(CREATE_TEXT_MSG_TABLE);
     }
 
     @Override
@@ -87,6 +101,7 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + AppUsageSchema.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AppInfoSchema.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + SurveyInfoSchema.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TextMsgInfoSchema.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
@@ -205,6 +220,24 @@ public class TrackDatabase extends SQLiteOpenHelper {
 
         surveyValues.put(SurveyInfoSchema.COLUMN_QUESTIONS_ANSWERS, builder.toString());
         db.insertWithOnConflict(SurveyInfoSchema.TABLE_NAME, null, surveyValues, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
+    /**
+     * Write a TextMsg entry into the database.
+     */
+    public void writeTextMsgRecord (Integer id, Integer date, Integer sender, Integer receiver,
+                                    String message) {
+        Log.d(TAG, "in writeTextMsgRecord");
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues textMsgValues = new ContentValues();
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_ID, id);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_DATE, date);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_SENDER, sender);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_RECEIVER, receiver);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_MESSAGE, message);
+        db.insert(TextMsgInfoSchema.TABLE_NAME, null, textMsgValues);
         db.close();
     }
 }

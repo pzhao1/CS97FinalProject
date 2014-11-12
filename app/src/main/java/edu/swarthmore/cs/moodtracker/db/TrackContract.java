@@ -36,4 +36,14 @@ public class TrackContract {
         public static final String COLUMN_DATE = "date";
         public static final String COLUMN_QUESTIONS_ANSWERS = "questions_answers";
     }
+
+    /* Inner class that defines the text messages table schema*/
+    public static abstract class TextMsgInfoSchema implements  BaseColumns {
+        public static final String TABLE_NAME = "TextMsgInfo";
+        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_SENDER = "sender";
+        public static final String COLUMN_RECEIVER = "receiver";
+        public static final String COLUMN_MESSAGE = "message";
+    }
 }
