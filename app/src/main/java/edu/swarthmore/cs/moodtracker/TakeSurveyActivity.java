@@ -71,8 +71,9 @@ public class TakeSurveyActivity extends FragmentActivity {
 
         //Bind the title indicator to the adapter
         CirclePageIndicator indicator = (CirclePageIndicator)findViewById(R.id.circles);
+        indicator.setRadius(indicator.getRadius() * 1.5f);
+        indicator.setAlpha(0.5f);
         indicator.setViewPager(mPager);
-
 
         if (savedInstanceState == null) {
             mResults = new HashMap<Integer, Integer>();
