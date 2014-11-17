@@ -127,7 +127,7 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
                 filesToScan.add(Uri.fromFile(saveFile));
             }
             catch (IOException e) {
-                Log.e(TAG, "Writing day " + date + "usage to file failed");
+                Log.e(TAG, "Writing day " + date + "usage to file failed");.
                 return false;
             }
         }
@@ -135,7 +135,6 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
     }
 
     private JSONObject appUsageListToJSON(List<AppUsageEntry> entriesList) throws JSONException {
-
         JSONObject rootObject = new JSONObject();
         JSONArray usageArray = new JSONArray();
         for (AppUsageEntry entry : entriesList) {
