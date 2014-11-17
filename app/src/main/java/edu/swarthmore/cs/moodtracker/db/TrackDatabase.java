@@ -5,12 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppInfoSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppUsageSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.SurveyInfoSchema;
+import edu.swarthmore.cs.moodtracker.db.TrackContract.TextMsgInfoSchema;
 
 /**
  * Created by Peng on 10/19/2014.
@@ -73,12 +76,24 @@ public class TrackDatabase extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_APP_INFO_TABLE);
 
+
         String CREATE_SURVEY_INFO_TABLE = "CREATE TABLE " + SurveyInfoSchema.TABLE_NAME + "("
-                + SurveyInfoSchema.COLUMN_SURVEY_NUMBER + " INTEGER PRIMARY KEY, "
+                + SurveyInfoSchema.COLUMN_DATE + " INTEGER PRIMARY KEY, "
                 + SurveyInfoSchema.COLUMN_QUESTIONS_ANSWERS + " Text"
-                + SurveyInfoSchema.COLUMN_DATE + " INTEGER"
                 + ")";
         db.execSQL(CREATE_SURVEY_INFO_TABLE);
+
+        // Create the TextMsgInfo table
+        String CREATE_TEXT_MSG_TABLE = "CREATE TABLE " + TextMsgInfoSchema.TABLE_NAME + "("
+                + TextMsgInfoSchema.COLUMN_ID + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_DATE + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_SENDER + " Text, "
+                + TextMsgInfoSchema.COLUMN_RECEIVER + " Text, "
+                + TextMsgInfoSchema.COLUMN_TYPE + " INTEGER, "
+                + TextMsgInfoSchema.COLUMN_MESSAGE + " Text, "
+                + "PRIMARY KEY (" + TextMsgInfoSchema.COLUMN_ID + ", " + TextMsgInfoSchema.COLUMN_DATE + ")"
+                + ")";
+        db.execSQL(CREATE_TEXT_MSG_TABLE);
     }
 
     @Override
@@ -87,6 +102,7 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + AppUsageSchema.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AppInfoSchema.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + SurveyInfoSchema.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TextMsgInfoSchema.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
@@ -165,6 +181,65 @@ public class TrackDatabase extends SQLiteOpenHelper {
         appUsageValues.put(AppUsageSchema.COLUMN_DATE, entry.DaysSinceEpoch);
         db.insertWithOnConflict(AppUsageSchema.TABLE_NAME, null, appUsageValues, SQLiteDatabase.CONFLICT_REPLACE);
 
+        db.close();
+    }
+
+    public List<SurveyEntry> readSurveyInfo() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String tableName = SurveyInfoSchema.TABLE_NAME;
+        String[] columns = null;
+        String selection = null;
+        String[] selectionArgs = null;
+        String groupBy = null;
+        String having = null;
+        String orderBy = SurveyInfoSchema.COLUMN_DATE + " DESC";
+        String limit = null;
+
+        Cursor surveyCursor = db.query(tableName, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+        ArrayList<SurveyEntry> entries = new ArrayList<SurveyEntry>();
+        if (surveyCursor.moveToFirst()) {
+            int numSurveys = surveyCursor.getCount();
+            for (int i = 0; i < numSurveys; i++) {
+                entries.add(new SurveyEntry(surveyCursor));
+            }
+        }
+
+        db.close();
+        return entries;
+    }
+
+    public void writeSurveyEntry(SurveyEntry entry) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues surveyValues = new ContentValues();
+        surveyValues.put(SurveyInfoSchema.COLUMN_DATE, entry.getDate().getTime());
+
+        StringBuilder builder = new StringBuilder();
+        for (MoodRatingQuestion question : entry.getQuestions()) {
+            String encodedQuestion = question.toString();
+            builder.append(encodedQuestion + SurveyEntry.QUESTIONS_DELIM);
+        }
+
+        surveyValues.put(SurveyInfoSchema.COLUMN_QUESTIONS_ANSWERS, builder.toString());
+        db.insertWithOnConflict(SurveyInfoSchema.TABLE_NAME, null, surveyValues, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
+    /**
+     * Write a TextMsg entry into the database.
+     */
+    public void writeTextMsgRecord (Integer id, Long date, String sender, String receiver,
+                                    Integer type,String message) {
+        Log.d(TAG, "in writeTextMsgRecord");
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues textMsgValues = new ContentValues();
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_ID, id);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_DATE, date);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_SENDER, sender);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_RECEIVER, receiver);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_TYPE,type);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_MESSAGE, message);
+        db.insert(TextMsgInfoSchema.TABLE_NAME, null, textMsgValues);
         db.close();
     }
 }

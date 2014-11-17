@@ -9,12 +9,18 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
+import com.viewpagerindicator.CirclePageIndicator;
+
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.swarthmore.cs.moodtracker.db.MoodRatingQuestion;
+import edu.swarthmore.cs.moodtracker.db.SurveyEntry;
+import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 
 
 /**
@@ -27,6 +33,9 @@ public class TakeSurveyActivity extends FragmentActivity {
     public static final String RESULTS = "results";
 
     public static final int MAX_PAGES = 10;
+
+    private static final String CURRENT_PAGE = "current_page";
+    private static final String NUM_PAGES = "num_pages";
 
     static final Map<Integer, String> PAGES_MAP;
     static {
@@ -60,15 +69,49 @@ public class TakeSurveyActivity extends FragmentActivity {
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
-        mResults = new HashMap<Integer, Integer>();
+        //Bind the title indicator to the adapter
+        CirclePageIndicator indicator = (CirclePageIndicator)findViewById(R.id.circles);
+        indicator.setRadius(indicator.getRadius() * 1.5f);
+        indicator.setAlpha(0.5f);
+        indicator.setViewPager(mPager);
+
+        if (savedInstanceState == null) {
+            mResults = new HashMap<Integer, Integer>();
+        } else {
+            mResults = (HashMap<Integer, Integer> )savedInstanceState.getSerializable(RESULTS);
+            mNumPages = savedInstanceState.getInt(NUM_PAGES);
+            mPagerAdapter.notifyDataSetChanged();
+            mPager.setCurrentItem(savedInstanceState.getInt(CURRENT_PAGE));
+        }
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(RESULTS, mResults);
+        outState.putInt(CURRENT_PAGE, mPager.getCurrentItem());
+        outState.putInt(NUM_PAGES, mNumPages);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+        } else if (item.getItemId() == R.id.action_done) {
+            Date date = new Date();
+
+            ArrayList<MoodRatingQuestion> questions = new ArrayList<MoodRatingQuestion>(10);
+            for (int pageNumber : mResults.keySet()) {
+                MoodRatingQuestion question = new MoodRatingQuestion(TakeSurveyActivity.PAGES_MAP.get(pageNumber), mResults.get(pageNumber));
+                questions.add(question);
+            }
+
+            SurveyEntry entry = new SurveyEntry(date, questions);
+            TrackDatabase db = TrackDatabase.getInstance(this);
+            db.writeSurveyEntry(entry);
+
         }
 
         return true;

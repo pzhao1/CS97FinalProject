@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/take_survey_button"
         android:gravity="center"
-        android:background="@color/blue"
+        android:background="@drawable/nav_drawer_item"
         android:layout_weight="0"/>
 
 </LinearLayout>

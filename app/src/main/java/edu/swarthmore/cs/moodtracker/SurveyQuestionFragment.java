@@ -67,6 +67,7 @@ public class SurveyQuestionFragment extends Fragment {
         mQuestion = getArguments().getString(TakeSurveyActivity.MOOD_QUESTION);
         mPageNumber = getArguments().getInt(TakeSurveyActivity.QUESTION_PAGE);
         mResults = (HashMap<Integer, Integer>)getArguments().getSerializable(TakeSurveyActivity.RESULTS);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -88,7 +89,6 @@ public class SurveyQuestionFragment extends Fragment {
 
         mListView = (ListView) rootView.findViewById(android.R.id.list);
 
-        setHasOptionsMenu(true);
         return rootView;
     }
 

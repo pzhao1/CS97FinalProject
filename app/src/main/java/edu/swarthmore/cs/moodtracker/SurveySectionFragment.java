@@ -9,8 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
+import edu.swarthmore.cs.moodtracker.db.SurveyEntry;
+import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
+
 /**
  * Created by rliang on 11/4/14.
+ *
  */
 public class SurveySectionFragment extends Fragment {
     /**
@@ -19,6 +25,7 @@ public class SurveySectionFragment extends Fragment {
      */
 
     private TextView mTextView;
+    private TrackDatabase mDatabase;
 
     public SurveySectionFragment() {
         super();
@@ -29,6 +36,7 @@ public class SurveySectionFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_section_survey, container, false);
         mTextView = (TextView) rootView.findViewById(R.id.take_survey_button);
+        mDatabase = TrackDatabase.getInstance(getActivity());
         return rootView;
     }
 
@@ -43,5 +51,8 @@ public class SurveySectionFragment extends Fragment {
                 getActivity().overridePendingTransition(R.anim.slide_enter, R.anim.pop_exit);
             }
         });
+
+        List<SurveyEntry> list = mDatabase.readSurveyInfo();
+
     }
 }
