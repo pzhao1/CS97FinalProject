@@ -50,6 +50,13 @@ public abstract class ReadAppUsageTask extends AsyncTask<Long, Integer, List<App
         if (params.length < 2 || params.length > 3)
             return null;
 
+        try {
+            Thread.sleep(250);
+        }
+        catch (Exception e) {
+
+        }
+
         // Parse parameters
         long startDate = params[0], endDate = params[1];
         int displayLimit = (params.length > 2 && params[2] != null) ? params[2].intValue() : -1;
