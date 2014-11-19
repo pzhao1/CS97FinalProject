@@ -19,11 +19,6 @@ import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
  *
  */
 public class SurveySectionFragment extends Fragment {
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
-
     private TextView mTextView;
     private TrackDatabase mDatabase;
 
