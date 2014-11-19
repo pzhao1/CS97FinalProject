@@ -24,7 +24,7 @@
     <string name="survey_done">Done      </string>
 
     <!-- Strings for app usage section -->
-    <string name="app_usage_waiting_text">Waiting for service to load &#8230;</string>
+    <string name="app_usage_waiting_text">Loading app usage data &#8230;</string>
     <string name="app_usage_pick_date">"DATE RANGE:    "</string>
     <string name="app_usage_pick_limit">"DISPLAY LIMIT: "</string>
     <string name="app_usage_filter_title">FILTERS</string>

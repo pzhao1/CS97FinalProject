@@ -135,7 +135,6 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
     }
 
     private JSONObject appUsageListToJSON(List<AppUsageEntry> entriesList) throws JSONException {
-
         JSONObject rootObject = new JSONObject();
         JSONArray usageArray = new JSONArray();
         for (AppUsageEntry entry : entriesList) {

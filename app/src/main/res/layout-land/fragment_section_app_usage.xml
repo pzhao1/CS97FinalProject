@@ -1,106 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:baselineAligned="true">
+
+
+    <LinearLayout
+        android:layout_width="@dimen/app_usage_filter_panel_width_land"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:orientation="vertical"
+        android:background="#FFDDDDDD">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/app_usage_filter_title_height"
+            android:textStyle="bold"
+            android:textSize="@dimen/app_usage_small_font_size"
+            android:text="@string/app_usage_filter_title"
+            android:gravity="center"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/app_usage_filter_padding_horizontal"
+            android:paddingRight="@dimen/app_usage_filter_padding_horizontal" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_usage_pick_date"
+                android:textSize="@dimen/app_usage_small_font_size"
+                android:gravity="center_vertical"
+                android:paddingTop="@dimen/app_usage_filter_padding_vertical"
+                android:paddingBottom="@dimen/app_usage_filter_padding_vertical" />
+
+            <Spinner
+                android:id="@+id/app_usage_date_range_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_app_usage_spinner"
+                android:paddingTop="@dimen/app_usage_filter_padding_vertical"
+                android:paddingBottom="@dimen/app_usage_filter_padding_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/app_usage_filter_padding_horizontal"
+            android:paddingRight="@dimen/app_usage_filter_padding_horizontal" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_usage_pick_limit"
+                android:textSize="@dimen/app_usage_small_font_size"
+                android:gravity="center_vertical"
+                android:paddingTop="@dimen/app_usage_filter_padding_vertical"
+                android:paddingBottom="@dimen/app_usage_filter_padding_vertical" />
+
+            <Spinner
+                android:id="@+id/app_usage_display_limit_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_app_usage_spinner"
+                android:paddingTop="@dimen/app_usage_filter_padding_vertical"
+                android:paddingBottom="@dimen/app_usage_filter_padding_vertical" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/app_usage_list"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
     <LinearLayout
         android:id="@+id/app_usage_waiting_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_centerVertical="true"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:visibility="gone">
+
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_usage_waiting_text"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/app_usage_content_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal" >
-
-        <LinearLayout
-            android:layout_width="@dimen/app_usage_filter_panel_width_land"
-            android:layout_height="match_parent"
-            android:layout_weight="0"
-            android:orientation="vertical"
-            android:background="#FFDDDDDD">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/app_usage_filter_title_height"
-                android:textStyle="bold"
-                android:textSize="@dimen/app_usage_normal_font_size"
-                android:text="@string/app_usage_filter_title"
-                android:gravity="center"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="0dp"
-                android:paddingBottom="@dimen/app_usage_filter_padding_bottom"
-                android:paddingLeft="@dimen/app_usage_filter_padding_horizontal"
-                android:paddingRight="@dimen/app_usage_filter_padding_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_usage_pick_date"
-                    android:textSize="@dimen/app_usage_small_font_size"
-                    android:gravity="center_vertical" />
-
-                <Spinner
-                    android:id="@+id/app_usage_date_range_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="0dp"
-                android:paddingBottom="@dimen/app_usage_filter_padding_bottom"
-                android:paddingLeft="@dimen/app_usage_filter_padding_horizontal"
-                android:paddingRight="@dimen/app_usage_filter_padding_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_usage_pick_limit"
-                    android:textSize="@dimen/app_usage_small_font_size"
-                    android:gravity="center_vertical"
-                    android:layout_weight="0" />
-
-                <Spinner
-                    android:id="@+id/app_usage_display_limit_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <ListView
-            android:id="@+id/app_usage_list"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:text="@string/app_usage_waiting_text"
+            android:layout_gravity="center"/>
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

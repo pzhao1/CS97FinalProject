@@ -32,7 +32,6 @@
 
     <style name="WhiteText">
         <item name="android:textColor">@color/holo_light</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DarkGreyText">
@@ -47,9 +46,8 @@
         <item name="android:textSize">@dimen/survey_heading_subtext</item>
     </style>
 
-    <style name="NavDrawerRow" parent="WhiteText">
-        <item name="android:typeface">serif</item>
-        <item name="android:textStyle">bold</item>
+    <style name="DrawerRowText" parent="WhiteText">
+        <item name="android:typeface">sans</item>
         <item name="android:textSize">@dimen/navigation_drawer_text_size</item>
     </style>
 

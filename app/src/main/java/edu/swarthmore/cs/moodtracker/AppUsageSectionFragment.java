@@ -42,7 +42,6 @@ public class AppUsageSectionFragment extends Fragment {
 
     // Other saved variables.
     private View mWaitingView = null;
-    private View mContentView = null;
     private ListView mAppUsageListView = null;
     private Spinner mDateRangeSpinner = null;
     private Spinner mDisplayLimitSpinner = null;
@@ -59,13 +58,12 @@ public class AppUsageSectionFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_section_app_usage, container, false);
-        mContentView = rootView.findViewById(R.id.app_usage_content_view);
         mWaitingView = rootView.findViewById(R.id.app_usage_waiting_view);
         mAppUsageListView = (ListView) rootView.findViewById(R.id.app_usage_list);
         mDateRangeSpinner = (Spinner) rootView.findViewById(R.id.app_usage_date_range_spinner);
         mDisplayLimitSpinner = (Spinner) rootView.findViewById(R.id.app_usage_display_limit_spinner);
 
-        syncLayoutWithService();
+        syncLayoutWithData(false);
         setupFilter();
 
         // Before we get connected, just display a waiting spinner. See fragment_section_app_usage.xml
@@ -77,7 +75,7 @@ public class AppUsageSectionFragment extends Fragment {
         super.onResume();
         mResumeInitialized = true;
         if (allInitialized())
-            updateAppUsageList();
+            tryUpdateAppUsageList();
     }
 
 
@@ -94,11 +92,7 @@ public class AppUsageSectionFragment extends Fragment {
      */
     public void setService(TrackService service) {
         mService = service;
-
-        if (mWaitingView != null && mContentView != null) {
-            syncLayoutWithService();
-            updateAppUsageList();
-        }
+        tryUpdateAppUsageList();
     }
 
     /**
@@ -106,32 +100,33 @@ public class AppUsageSectionFragment extends Fragment {
      */
     public void unsetService() {
         mService = null;
-        syncLayoutWithService();
+        syncLayoutWithData(false);
     }
 
     /**
      * Update layout based on the current service status.
-     * If we are connected to service, hide the waiting section and display usage list.
-     * If we are disconnected to service, hide the usage list and display waiting section.
+     * If we have data, hide the waiting section and display usage list.
+     * If we don't have data, hide the usage list and display waiting section.
      */
-    private void syncLayoutWithService() {
-        if (mService != null) {
+    private void syncLayoutWithData(boolean hasData) {
+        if (hasData) {
             mWaitingView.setVisibility(View.GONE);
-            mContentView.setVisibility(View.VISIBLE);
+            mAppUsageListView.setVisibility(View.VISIBLE);
         }
         else {
             mWaitingView.setVisibility(View.VISIBLE);
-            mContentView.setVisibility(View.GONE);
+            mAppUsageListView.setVisibility(View.GONE);
         }
     }
 
     /**
      * Update the usage times in app usage list.
      */
-    private void updateAppUsageList() {
+    private void tryUpdateAppUsageList() {
         if (!allInitialized())
             return;
 
+        syncLayoutWithData(false);
         // Read app usage from database (asynchronously) and use result to update usage list.
         long currentDate = TrackDateUtil.getDaysSinceEpoch();
         new ReadAppUsageTask(getActivity(), mService) {
@@ -147,6 +142,7 @@ public class AppUsageSectionFragment extends Fragment {
                                 getActivity(), R.layout.list_item_app_usage, result);
                         mAppUsageListView.setAdapter(adapter);
                     }
+                    syncLayoutWithData(true);
                 }
             }
         }.execute(currentDate - mDateRange, currentDate, (long)mDisplayLimit);
@@ -166,12 +162,12 @@ public class AppUsageSectionFragment extends Fragment {
         mDateRangeSpinner.setOnItemSelectedListener(new DateRangeSpinnerListener());
 
         // Initialize the display limit spinner
-        ArrayAdapter<CharSequence> displayLimitAdapater = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> displayLimitAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.app_usage_display_limit_array,  R.layout.list_item_spinner_filter);
 
-        displayLimitAdapater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        displayLimitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        mDisplayLimitSpinner.setAdapter(displayLimitAdapater);
+        mDisplayLimitSpinner.setAdapter(displayLimitAdapter);
         mDisplayLimitSpinner.setOnItemSelectedListener(new DisplayLimitSpinnerListener());
 
         // Select spinners to default values.
@@ -209,7 +205,7 @@ public class AppUsageSectionFragment extends Fragment {
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
             mDateRangeInitialized = true;
             mDateRange = mPositionToPrevDaysArray[pos];
-            updateAppUsageList();
+            tryUpdateAppUsageList();
         }
 
         @Override
@@ -226,7 +222,7 @@ public class AppUsageSectionFragment extends Fragment {
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
             mDisplayLimitInitialized = true;
             mDisplayLimit = mPositionToLimitArray[pos];
-            updateAppUsageList();
+            tryUpdateAppUsageList();
         }
 
         @Override
