@@ -78,7 +78,7 @@ public class TrackDatabase extends SQLiteOpenHelper {
 
 
         String CREATE_SURVEY_INFO_TABLE = "CREATE TABLE " + SurveyInfoSchema.TABLE_NAME + "("
-                + SurveyInfoSchema.COLUMN_DATE + " INTEGER PRIMARY KEY, "
+                + SurveyInfoSchema.COLUMN_DATE + " DECIMAL PRIMARY KEY, "
                 + SurveyInfoSchema.COLUMN_QUESTIONS_ANSWERS + " Text"
                 + ")";
         db.execSQL(CREATE_SURVEY_INFO_TABLE);

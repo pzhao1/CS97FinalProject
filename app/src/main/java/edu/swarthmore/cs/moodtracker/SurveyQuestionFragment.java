@@ -104,7 +104,7 @@ public class SurveyQuestionFragment extends Fragment {
 
         if (mAdapter == null) {
             List<String> options = Arrays.asList(QUESTION_TEXT);
-            mAdapter = new SurveyArrayAdapter(getActivity(), R.layout.list_item_survey, android.R.id.text1, options);
+            mAdapter = new SurveyArrayAdapter(getActivity(), R.layout.list_item_survey_question, android.R.id.text1, options);
             mAdapter.setRowSelectionListener(mSelectionListener);
         }
 

@@ -26,7 +26,7 @@ public class SurveyEntry {
         }
         int index = cursor.getColumnIndex(TrackContract.SurveyInfoSchema.COLUMN_DATE);
         if (index >= 0) {
-            mDate = new Date(cursor.getInt(index));
+            mDate = new Date(cursor.getLong(index));
         }
 
         index = cursor.getColumnIndex(TrackContract.SurveyInfoSchema.COLUMN_QUESTIONS_ANSWERS);
