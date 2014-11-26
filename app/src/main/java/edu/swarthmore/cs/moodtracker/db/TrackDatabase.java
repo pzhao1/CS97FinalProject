@@ -10,6 +10,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.validation.Schema;
+
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppInfoSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppUsageSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.SurveyInfoSchema;
@@ -227,25 +229,58 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.close();
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Read a TextMsg entry from the database
+     */
+    public ArrayList<TextMsgEntry> readTextMsg(boolean negativeScore) {
+        SQLiteDatabase db = this.getReadableDatabase();
+>>>>>>> 263c4b71c8834aff482e40bb70a14abb17e91b40
 
+        // Specify conditions ("WHERE" clause)
+        String conditions = "";
+        if (negativeScore) {
+            conditions += " WHERE ";
+            conditions += TextMsgInfoSchema.COLUMN_POS + " < 0 OR ";
+            conditions += TextMsgInfoSchema.COLUMN_NEG + " < 0 OR ";
+            conditions += TextMsgInfoSchema.COLUMN_NEUTRAL + " < 0";
+        }
 
+        // Construct raw query.
+        String rawQuery = "SELECT * FROM " + TextMsgInfoSchema.TABLE_NAME + conditions;
 
+        // Query the database to get a cursor
+        Cursor cursor = db.rawQuery(rawQuery, null);
+
+        ArrayList<TextMsgEntry> result = new ArrayList<TextMsgEntry>();
+        if (cursor.moveToFirst()){
+            for (int i=0; i<cursor.getCount(); i++){
+                result.add(new TextMsgEntry(cursor));
+            }
+        }
+        db.close();
+
+        return result;
+    }
      /**
      * Write a TextMsg entry into the database.
      */
-    public void writeTextMsgRecord (Integer id, Long date, String sender, String receiver,
-                                    Integer type,String message) {
+    public void writeTextMsgRecord (TextMsgEntry entry) {
         Log.d(TAG, "in writeTextMsgRecord");
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues textMsgValues = new ContentValues();
-        textMsgValues.put(TextMsgInfoSchema.COLUMN_ID, id);
-        textMsgValues.put(TextMsgInfoSchema.COLUMN_DATE, date);
-        textMsgValues.put(TextMsgInfoSchema.COLUMN_SENDER, sender);
-        textMsgValues.put(TextMsgInfoSchema.COLUMN_RECEIVER, receiver);
-        textMsgValues.put(TextMsgInfoSchema.COLUMN_TYPE,type);
-        textMsgValues.put(TextMsgInfoSchema.COLUMN_MESSAGE, message);
-        db.insert(TextMsgInfoSchema.TABLE_NAME, null, textMsgValues);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_ID, entry.id);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_DATE, entry.date);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_SENDER, entry.sender);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_RECEIVER, entry.receiver);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_TYPE,entry.type);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_MESSAGE, entry.message);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_POS, entry.positive);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_NEG, entry.negative);
+        textMsgValues.put(TextMsgInfoSchema.COLUMN_NEUTRAL, entry.neutral);
+        db.insertWithOnConflict(TextMsgInfoSchema.TABLE_NAME, null, textMsgValues,SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 

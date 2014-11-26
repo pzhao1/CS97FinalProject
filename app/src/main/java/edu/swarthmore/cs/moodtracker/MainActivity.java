@@ -17,8 +17,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
+import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
+import edu.swarthmore.cs.moodtracker.db.TextMsgEntry;
+import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 import edu.swarthmore.cs.moodtracker.receivers.NotificationAlarmReceiver;
 import edu.swarthmore.cs.moodtracker.receivers.getLastDayMsgReceiver;
 import edu.swarthmore.cs.moodtracker.services.TrackService;
@@ -65,6 +69,7 @@ public class MainActivity extends FragmentActivity
 
         setNotificationForSurvey();
         setUpTextMsgCollecting();
+
     }
 
     @Override
@@ -234,6 +239,40 @@ public class MainActivity extends FragmentActivity
                 ((AppUsageSectionFragment) mCurrentSectionFragment).unsetService();
         }
     }
+
+    /*
+    private void testTextMsg() {
+        ArrayList<TextMsgEntry> entries = new ArrayList<TextMsgEntry>();
+        for (int i=0; i<40; i++) {
+            TextMsgEntry entry = new TextMsgEntry(1000+i, System.currentTimeMillis(), "test", "test", 0,
+            "This is test msg " + i, 0, 0, 0);
+            if (i%5 == 1) {
+                entry.positive = -1;
+            }
+            else if (i%5 == 2) {
+                entry.negative = -1;
+            }
+            else if (i%5 == 3) {
+                entry.neutral = -1;
+            }
+            else if (i%5 == 4) {
+                entry.positive = -1;
+                entry.negative = -1;
+                entry.neutral = -1;
+            }
+            entries.add(entry);
+        }
+
+        TrackDatabase db = TrackDatabase.getInstance(this);
+        for (TextMsgEntry entry:entries) {
+            db.writeTextMsgRecord(entry);
+        }
+
+        entries = db.readTextMsg(false);
+
+        entries = db.readTextMsg(true);
+    }
+    */
 
 
 }

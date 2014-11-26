@@ -19,15 +19,15 @@ public class TextMsgEntry {
     // Constructor
     public TextMsgEntry(int id, long date, String sender, String receiver, int type,
                         String message, double neutral, double positive, double negative) {
-        this.id = -1;
-        this.date = -1;
-        this.sender = "";
-        this.receiver = "";
-        this.type = -1;
-        this.message = "";
-        this.neutral = -1;
-        this.positive = -1;
-        this.negative = -1;
+        this.id = id;
+        this.date = date;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.type = type;
+        this.message = message;
+        this.neutral = neutral;
+        this.positive = positive;
+        this.negative = negative;
     }
 
     public TextMsgEntry (Cursor cursor) {
