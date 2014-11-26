@@ -17,13 +17,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-<<<<<<< HEAD
-import com.facebook.AppEventsLogger;
-
-=======
-import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
-import java.util.Arrays;
->>>>>>> 9c27c11076d9bc2503cb3640dbf91b823a8bc62f
 import java.util.Calendar;
 
 import edu.swarthmore.cs.moodtracker.receivers.NotificationAlarmReceiver;
@@ -154,9 +147,6 @@ public class MainActivity extends FragmentActivity
     protected void onPause() {
         if (mService != null)
             mService.saveDataToDatabase();
-
-        // Logs 'app deactivate' App Event.
-        AppEventsLogger.deactivateApp(this);
         super.onPause();
     }
 
@@ -164,9 +154,6 @@ public class MainActivity extends FragmentActivity
     protected void onResume() {
         mNavigationDrawerFragment.selectItem(mSelectedSection);
         invalidateOptionsMenu();
-
-        // Facebook: Logs 'install' and 'app activate' App Events.
-        AppEventsLogger.activateApp(this);
         super.onResume();
     }
 
