@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import edu.swarthmore.cs.moodtracker.receivers.NotificationAlarmReceiver;
@@ -234,4 +236,6 @@ public class MainActivity extends FragmentActivity
                 ((AppUsageSectionFragment) mCurrentSectionFragment).unsetService();
         }
     }
+
+
 }

@@ -4,9 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
+import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
+
+import java.util.Arrays;
 import java.util.Calendar;
 
 import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
@@ -64,7 +68,35 @@ public class getLastDayMsgReceiver extends BroadcastReceiver {
             }
         }
         cur.close();
+        tryRegression();
 
+    }
+
+
+    private void tryRegression() {
+        OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
+        double[] y = {11.0, 12.0, 13.0, 14.0, 15.0, 16.0};
+        double[][] x = new double[6] [];
+        x[0] = new double[]{0, 0, 0, 0, 0};
+        x[1] = new double[]{2.0, 0, 0, 0, 0};
+        x[2] = new double[]{0, 3.0, 0, 0, 0};
+        x[3] = new double[]{0, 0, 4.0, 0, 0};
+        x[4] = new double[]{0, 0, 0, 5.0, 0};
+        x[5] = new double[]{0, 0, 0, 0, 6.0};
+        regression.newSampleData(y, x);
+
+        double[] beta = regression.estimateRegressionParameters();
+        System.out.println("beta: " + Arrays.toString(beta));
+        double rSquared = regression.calculateRSquared();
+        System.out.printf("RSquare: %f\n", rSquared);
+    }
+
+    private void trainModel(Context context) {
+        OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
+        TrackDatabase mDatabase = TrackDatabase.getInstance(context);
+        // Read in dependent variable -- scores for mood each day
+        double[] moodScore = null;
+        // Read in app usage info
 
     }
 

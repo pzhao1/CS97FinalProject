@@ -225,6 +225,16 @@ public class TrackDatabase extends SQLiteOpenHelper {
     }
 
     /**
+     * Read a TextMsg entry from the database
+     */
+    public double readTextMsgScore() {
+        //do something
+        return 1.0;
+    }
+
+
+
+     /**
      * Write a TextMsg entry into the database.
      */
     public void writeTextMsgRecord (Integer id, Long date, String sender, String receiver,
@@ -242,4 +252,6 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.insert(TextMsgInfoSchema.TABLE_NAME, null, textMsgValues);
         db.close();
     }
+
+
 }
