@@ -227,13 +227,6 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.close();
     }
 
-    /**
-     * Read a TextMsg entry from the database
-     */
-    public double readTextMsgScore() {
-        //do something
-        return 1.0;
-    }
 
 
 

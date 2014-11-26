@@ -1,7 +1,7 @@
 package edu.swarthmore.cs.moodtracker.db;
 
 import android.database.Cursor;
-
+import edu.swarthmore.cs.moodtracker.db.TrackContract.TextMsgInfoSchema;
 /**
  * Created by cwang3 on 11/26/14.
  */
@@ -35,14 +35,14 @@ public class TextMsgEntry {
         if (cursor.isAfterLast()) {
             return;
         }
-        this.id = cursor.getInt(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_ID));
-        this.date = cursor.getLong(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_DATE));
-        this.sender = cursor.getString(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_SENDER));
-        this.receiver = cursor.getString(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_RECEIVER));
-        this.type = cursor.getInt(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_TYPE));
-        this.message = cursor.getString(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_MESSAGE));
-        this.neutral = cursor.getInt(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_NEUTRAL));
-        this.positive = cursor.getInt(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_POS));
-        this.negative = cursor.getInt(cursor.getColumnIndex(TrackContract.TextMsgInfoSchema.COLUMN_NEG));
+        this.id = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_ID));
+        this.date = cursor.getLong(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_DATE));
+        this.sender = cursor.getString(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_SENDER));
+        this.receiver = cursor.getString(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_RECEIVER));
+        this.type = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_TYPE));
+        this.message = cursor.getString(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_MESSAGE));
+        this.neutral = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_NEUTRAL));
+        this.positive = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_POS));
+        this.negative = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_NEG));
     }
 }
