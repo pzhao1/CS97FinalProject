@@ -2,6 +2,9 @@ package edu.swarthmore.cs.moodtracker.db;
 
 import android.database.Cursor;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +53,24 @@ public class SurveyEntry {
 
     public List<MoodRatingQuestion> getQuestions() {
         return mQuestions;
+    }
+
+
+    /**
+     * Converts class to a JSON object. Used for exporting data.
+     * @return The JSON representation of this class.
+     */
+    public JSONObject toJSON() {
+        try {
+            JSONObject jsonObj = new JSONObject();
+            for (MoodRatingQuestion question : mQuestions) {
+                jsonObj.put(question.getQuestion(), question.getAnswer());
+            }
+            return jsonObj;
+        }
+        catch (JSONException e) {
+            return null;
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package edu.swarthmore.cs.moodtracker.util;
 
+import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -14,6 +15,12 @@ public class TrackDateUtil {
     public static long getDaysSinceEpoch() {
         long offset = mMyTimeZone.getOffset(System.currentTimeMillis());
         long millis = System.currentTimeMillis() + offset;
+        return millis / (24*3600*1000);
+    }
+
+    public static long getDaysSinceEpoch(Date date) {
+        long offset = mMyTimeZone.getOffset(System.currentTimeMillis());
+        long millis = date.getTime() + offset;
         return millis / (24*3600*1000);
     }
 }

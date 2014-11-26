@@ -3,7 +3,6 @@ package edu.swarthmore.cs.moodtracker.db;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -93,7 +92,7 @@ public class AppUsageEntry {
 
 
     /**
-     * Converts class to a JSON object. Used for storage.
+     * Converts class to a JSON object. Used for exporting data.
      * @return The JSON representation of this class.
      */
     public JSONObject toJSON() {
@@ -102,9 +101,9 @@ public class AppUsageEntry {
             jsonObj.put(JSON_PACKAGE_NAME, PackageName);
             jsonObj.put(JSON_APP_NAME, AppName);
 
-            byte[] bytes = getIconInByteArray();
-            String iconEncodedString = Base64.encodeToString(bytes, Base64.DEFAULT);
-            jsonObj.put(JSON_APP_ICON, iconEncodedString);
+            //byte[] bytes = getIconInByteArray();
+            //String iconEncodedString = Base64.encodeToString(bytes, Base64.DEFAULT);
+            //jsonObj.put(JSON_APP_ICON, iconEncodedString);
 
             jsonObj.put(JSON_USAGE, UsageTimeSec);
             jsonObj.put(JSON_DATE, DaysSinceEpoch);

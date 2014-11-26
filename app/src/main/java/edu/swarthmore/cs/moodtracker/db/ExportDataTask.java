@@ -55,8 +55,17 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
                 return false;
         }
 
+        // MTP has an indefinite delay in scanning new files. We keep track of new files
+        // and send a broadcast requesting immediate scan to get files immediately.
         ArrayList<Uri> filesToScan = new ArrayList<Uri>();
+
+        // Export app usage data.
         if (!exportAppUsageData(saveDir, filesToScan)) {
+            return false;
+        }
+
+        // Export app usage data.
+        if (!exportSurveyData(saveDir, filesToScan)) {
             return false;
         }
 
@@ -127,7 +136,7 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
                 filesToScan.add(Uri.fromFile(saveFile));
             }
             catch (IOException e) {
-                Log.e(TAG, "Writing day " + date + "usage to file failed");
+                Log.e(TAG, "Writing day " + date + " app usage to file failed");
                 return false;
             }
         }
@@ -143,6 +152,71 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
         }
 
         rootObject.put("AppUsage", usageArray);
+        return rootObject;
+    }
+
+
+    private boolean exportSurveyData(File saveDir, ArrayList<Uri> filesToScan) {
+
+        // Pull data from database.
+        List<SurveyEntry> allEntries = mDatabase.readSurveyInfo();
+        HashMap<Long, List<SurveyEntry> > entriesByDay = new HashMap<Long, List<SurveyEntry>>();
+
+        for (SurveyEntry entry : allEntries) {
+            long daysSinceEpoch = TrackDateUtil.getDaysSinceEpoch(entry.getDate());
+            if (!entriesByDay.containsKey(daysSinceEpoch)) {
+                entriesByDay.put(daysSinceEpoch, new ArrayList<SurveyEntry>());
+            }
+            entriesByDay.get(daysSinceEpoch).add(entry);
+        }
+
+        for (long date : entriesByDay.keySet()) {
+
+            File saveFile = new File(saveDir, "SurveyInfo" + String.valueOf(date) + ".json");
+            if (saveFile.exists()) {
+                if (date == TrackDateUtil.getDaysSinceEpoch() )
+                    Log.d(TAG, "deleting today (" + date + ") survey info file: " + (saveFile.delete() ? "success" : "fail"));
+                else
+                    continue;
+            }
+
+            List<SurveyEntry> oneDayEntries = entriesByDay.get(date);
+            JSONObject rootObject;
+            try {
+                rootObject = surveyListToJSON(oneDayEntries);
+            }
+            catch (JSONException e) {
+                Log.e(TAG, "Converting day " + date + " survey to JSON failed");
+                return false;
+            }
+
+            try  {
+                FileOutputStream fOut = new FileOutputStream(saveFile);
+                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+                myOutWriter.write(rootObject.toString());
+                myOutWriter.flush();
+                myOutWriter.close();
+                fOut.close();
+                filesToScan.add(Uri.fromFile(saveFile));
+            }
+            catch (IOException e) {
+                Log.e(TAG, "Writing day " + date + " survey info to file failed");
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private JSONObject surveyListToJSON(List<SurveyEntry> entriesList) throws JSONException {
+        JSONObject rootObject = new JSONObject();
+        JSONArray usageArray = new JSONArray();
+        for (SurveyEntry entry : entriesList) {
+            JSONObject usageObject = entry.toJSON();
+            usageArray.put(usageObject);
+        }
+
+        rootObject.put("SurveyInfo", usageArray);
         return rootObject;
     }
 }
