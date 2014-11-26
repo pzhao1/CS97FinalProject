@@ -51,6 +51,13 @@
         <item>All</item>
     </string-array>
 
+
+    <!-- Strings for text analysis section -->
+    <string name="text_analysis_waiting_text">Loading classifier &#8230;</string>
+    <string name="text_analysis_classify_btn_text">Classify</string>
+
+
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

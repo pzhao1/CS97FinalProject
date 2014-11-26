@@ -112,6 +112,7 @@ public class TakeSurveyActivity extends FragmentActivity {
             TrackDatabase db = TrackDatabase.getInstance(this);
             db.writeSurveyEntry(entry);
 
+            finish();
         }
 
         return true;
