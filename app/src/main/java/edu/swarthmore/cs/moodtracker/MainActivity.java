@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.AppEventsLogger;
+
 import java.util.Calendar;
 
 import edu.swarthmore.cs.moodtracker.receivers.NotificationAlarmReceiver;
@@ -153,6 +155,9 @@ public class MainActivity extends FragmentActivity
     protected void onPause() {
         if (mService != null)
             mService.saveDataToDatabase();
+
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
         super.onPause();
     }
 
@@ -160,6 +165,9 @@ public class MainActivity extends FragmentActivity
     protected void onResume() {
         mNavigationDrawerFragment.selectItem(mSelectedSection);
         invalidateOptionsMenu();
+
+        // Facebook: Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
         super.onResume();
     }
 
