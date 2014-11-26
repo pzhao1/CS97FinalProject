@@ -1,7 +1,6 @@
 package edu.swarthmore.cs.moodtracker;
 
 import android.app.Activity;
-import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,8 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.aliasi.classify.JointClassifier;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -25,11 +22,13 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+//import com.aliasi.classify.JointClassifier;
+
+
 
 /**
  * Fragment for text analysis section.
@@ -43,7 +42,7 @@ public class TextSectionFragment extends Fragment {
     private EditText mClassifyInput = null;
     private Button mClassifyBtn = null;
     private TextView mResultText = null;
-    private JointClassifier<CharSequence> mPolarityClassifier;
+    //private JointClassifier<CharSequence> mPolarityClassifier;
 
     /**
      * Default constructor
@@ -69,7 +68,7 @@ public class TextSectionFragment extends Fragment {
         return rootView;
     }
 
-
+    /*
     private void setupLocalClassifyUI() {
         mWaitingView.setVisibility(View.GONE);
         mContentView.setVisibility(View.VISIBLE);
@@ -93,6 +92,7 @@ public class TextSectionFragment extends Fragment {
             }
         });
     }
+    */
 
     private void setupRemoteClassifyUI() {
         mWaitingView.setVisibility(View.GONE);
@@ -183,6 +183,7 @@ public class TextSectionFragment extends Fragment {
         }
     }
 
+    /*
     private class LoadClassifierTask extends AsyncTask<Integer, Integer, Boolean> {
         @Override
         protected Boolean doInBackground(Integer... params) {
@@ -211,4 +212,5 @@ public class TextSectionFragment extends Fragment {
             }
         }
     }
+    */
 }
