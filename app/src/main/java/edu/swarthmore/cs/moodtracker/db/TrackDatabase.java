@@ -10,8 +10,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.validation.Schema;
-
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppInfoSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.AppUsageSchema;
 import edu.swarthmore.cs.moodtracker.db.TrackContract.SurveyInfoSchema;
@@ -229,14 +227,11 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.close();
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Read a TextMsg entry from the database
      */
     public ArrayList<TextMsgEntry> readTextMsg(boolean negativeScore) {
         SQLiteDatabase db = this.getReadableDatabase();
->>>>>>> 263c4b71c8834aff482e40bb70a14abb17e91b40
 
         // Specify conditions ("WHERE" clause)
         String conditions = "";
