@@ -4,13 +4,10 @@ import android.app.ActionBar;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -23,7 +20,6 @@ import android.view.MenuItem;
 import java.util.Calendar;
 
 import edu.swarthmore.cs.moodtracker.receivers.NotificationAlarmReceiver;
-import edu.swarthmore.cs.moodtracker.receivers.OutgoingTextMsgObserver;
 import edu.swarthmore.cs.moodtracker.receivers.getLastDayMsgReceiver;
 import edu.swarthmore.cs.moodtracker.services.TrackService;
 
@@ -68,9 +64,7 @@ public class MainActivity extends FragmentActivity
         }
 
         setNotificationForSurvey();
-        // I think we only need to choose one of these two:
-        trackTextMessages();
-        getWholeDayMessages();
+        setUpTextMsgCollecting();
     }
 
     @Override
@@ -197,33 +191,22 @@ public class MainActivity extends FragmentActivity
     }
 
     /**
-     * Set up tracking of incoming and outgoing messages.
+     * Collect an entire day of messages at 00:00:01 the next day
      */
-    private void trackTextMessages() {
-        //Cursor mCursor = getContentResolver().query(Uri.parse("content://sms/inbox"),null,null,null,null);
-        //mCursor.moveToFirst();
-        ContentResolver contentResolver = getContentResolver();
-        OutgoingTextMsgObserver outgoingTextMsgObserver = new OutgoingTextMsgObserver(new Handler(), this);
-        contentResolver.registerContentObserver(Uri.parse("content://sms"), true, outgoingTextMsgObserver);
-    }
-
-    /**
-     * Collect an entire day of messages at 00:01:00 the next day
-     */
-    private void getWholeDayMessages() {
+    private void setUpTextMsgCollecting() {
+        Log.d("setUpTextMsgCollecting", "called");
         PendingIntent mPendingIntent;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
         Intent myIntent = new Intent(this, getLastDayMsgReceiver.class);
-        mPendingIntent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
+        mPendingIntent = PendingIntent.getBroadcast(this, 100, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Calendar mCalendar = Calendar.getInstance();
-        //if (mCalendar.get(Calendar.HOUR_OF_DAY)>=0 && mCalendar.get(Calendar.MINUTE)>=1) {
-        //    mCalendar.add(Calendar.DAY_OF_MONTH, 1);
-        //}
-        mCalendar.set(Calendar.HOUR_OF_DAY,00);
-        mCalendar.set(Calendar.MINUTE,01);
-        mCalendar.set(Calendar.SECOND,00);
-        mAlarmManager.setRepeating(AlarmManager.RTC, mCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
-
+        if (mCalendar.get(Calendar.HOUR_OF_DAY)>=2) {
+            mCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        mCalendar.set(Calendar.HOUR_OF_DAY,2);
+        mCalendar.set(Calendar.MINUTE,0);
+        mCalendar.set(Calendar.SECOND,0);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, mCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
     }
 
     /**
