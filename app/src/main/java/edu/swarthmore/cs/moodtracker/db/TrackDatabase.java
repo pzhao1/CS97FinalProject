@@ -91,6 +91,9 @@ public class TrackDatabase extends SQLiteOpenHelper {
                 + TextMsgInfoSchema.COLUMN_RECEIVER + " Text, "
                 + TextMsgInfoSchema.COLUMN_TYPE + " INTEGER, "
                 + TextMsgInfoSchema.COLUMN_MESSAGE + " Text, "
+                + TextMsgInfoSchema.COLUMN_POS + " REAL, "
+                + TextMsgInfoSchema.COLUMN_NEG + " REAL, "
+                + TextMsgInfoSchema.COLUMN_NEUTRAL + " REAL, "
                 + "PRIMARY KEY (" + TextMsgInfoSchema.COLUMN_ID + ", " + TextMsgInfoSchema.COLUMN_DATE + ")"
                 + ")";
         db.execSQL(CREATE_TEXT_MSG_TABLE);
@@ -225,6 +228,16 @@ public class TrackDatabase extends SQLiteOpenHelper {
     }
 
     /**
+     * Read a TextMsg entry from the database
+     */
+    public double readTextMsgScore() {
+        //do something
+        return 1.0;
+    }
+
+
+
+     /**
      * Write a TextMsg entry into the database.
      */
     public void writeTextMsgRecord (Integer id, Long date, String sender, String receiver,
@@ -242,4 +255,6 @@ public class TrackDatabase extends SQLiteOpenHelper {
         db.insert(TextMsgInfoSchema.TABLE_NAME, null, textMsgValues);
         db.close();
     }
+
+
 }

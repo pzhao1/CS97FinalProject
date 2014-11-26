@@ -46,5 +46,8 @@ public class TrackContract {
         public static final String COLUMN_RECEIVER = "receiver";
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_MESSAGE = "message";
+        public static final String COLUMN_POS = "pos";
+        public static final String COLUMN_NEG = "neg";
+        public static final String COLUMN_NEUTRAL = "neutral";
     }
 }
