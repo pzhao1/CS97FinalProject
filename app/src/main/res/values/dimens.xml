@@ -48,4 +48,6 @@
     <dimen name="survey_heading_subtext">16sp</dimen>
     <dimen name="take_survey_text">20sp</dimen>
 
+    <dimen name="survey_entry_date_field">14dp</dimen>
+
 </resources>

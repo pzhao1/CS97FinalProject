@@ -106,11 +106,11 @@ public class MainActivity extends FragmentActivity
                 break;
             case 2:
                 mCurrentSectionFragment = new SurveySectionFragment();
+                mCurrentSectionFragment.setRetainInstance(true);
                 mTitle = getString(R.string.title_section_surveys);
                 break;
         }
 
-        //mCurrentSectionFragment.setRetainInstance(true);
         fragmentManager.beginTransaction().replace(R.id.container, mCurrentSectionFragment).commit();
     }
 

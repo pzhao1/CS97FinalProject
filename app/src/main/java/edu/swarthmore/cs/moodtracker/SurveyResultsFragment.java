@@ -6,13 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class SubmitSurveyFragment extends Fragment {
-    public static SubmitSurveyFragment newInstance(String param1, String param2) {
-        SubmitSurveyFragment fragment = new SubmitSurveyFragment();
+public class SurveyResultsFragment extends Fragment {
+    public static SurveyResultsFragment newInstance(String param1, String param2) {
+        SurveyResultsFragment fragment = new SurveyResultsFragment();
         return fragment;
     }
 
-    public SubmitSurveyFragment() {
+    public SurveyResultsFragment() {
         super();
     }
 

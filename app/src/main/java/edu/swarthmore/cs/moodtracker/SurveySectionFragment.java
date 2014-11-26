@@ -7,25 +7,24 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
 
 import edu.swarthmore.cs.moodtracker.db.SurveyEntry;
 import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
+import edu.swarthmore.cs.moodtracker.util.SurveyEntryAdapter;
 
 /**
  * Created by rliang on 11/4/14.
  *
  */
 public class SurveySectionFragment extends Fragment {
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
-
     private TextView mTextView;
     private TrackDatabase mDatabase;
+    private SurveyEntryAdapter mAdapter;
+    private ListView mListView;
 
     public SurveySectionFragment() {
         super();
@@ -37,6 +36,8 @@ public class SurveySectionFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_section_survey, container, false);
         mTextView = (TextView) rootView.findViewById(R.id.take_survey_button);
         mDatabase = TrackDatabase.getInstance(getActivity());
+        mListView = (ListView) rootView.findViewById(android.R.id.list);
+
         return rootView;
     }
 
@@ -53,6 +54,7 @@ public class SurveySectionFragment extends Fragment {
         });
 
         List<SurveyEntry> list = mDatabase.readSurveyInfo();
-
+        mAdapter = new SurveyEntryAdapter(getActivity(), R.layout.list_item_survey_entry, android.R.id.text1, list);
+        mListView.setAdapter(mAdapter);
     }
 }
