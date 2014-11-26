@@ -12,6 +12,7 @@ import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import edu.swarthmore.cs.moodtracker.db.TextMsgEntry;
 import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 
 /**
@@ -62,7 +63,8 @@ public class getLastDayMsgReceiver extends BroadcastReceiver {
                     String message = cur.getString(cur.getColumnIndex("body"));
                     Integer type = cur.getInt(cur.getColumnIndex("type"));
                     Log.d(TAG, message);
-                    mDatabase.writeTextMsgRecord(id, date, sender, receiver, type, message);
+                    TextMsgEntry entry = new TextMsgEntry(id,date,sender,receiver,type,message,-1,-1,-1);
+                    mDatabase.writeTextMsgRecord(entry);
                 } while (cur.moveToNext());
             }
             cur.close();
