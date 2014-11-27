@@ -70,11 +70,11 @@ public class SettingsActivity extends PreferenceActivity {
             new ExportDataTask(getActivity()) {
 
                 @Override
-                public void onFinish(boolean result) {
+                public void onFinish(boolean result, String reason) {
                     if (result)
                         Toast.makeText(getActivity(), "Export Success", Toast.LENGTH_SHORT).show();
                     else
-                        Toast.makeText(getActivity(), "Export Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Export Failed because " + reason, Toast.LENGTH_SHORT).show();
                 }
             }.execute();
         }

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -262,7 +261,6 @@ public class TrackDatabase extends SQLiteOpenHelper {
      * Write a TextMsg entry into the database.
      */
     public void writeTextMsgRecord (TextMsgEntry entry) {
-        Log.d(TAG, "in writeTextMsgRecord");
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues textMsgValues = new ContentValues();

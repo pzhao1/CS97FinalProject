@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
     public static final String TAG = "ExportDataTask";
     private Context mContext;
     private TrackDatabase mDatabase;
+    private String mReason = "";
 
     /**
      * Construct a SaveAppUsage task that writes app usage to database.
@@ -44,15 +46,21 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
     @Override
     protected Boolean doInBackground(Integer... params) {
 
-        if (!isExternalStorageWritable())
+        if (!isExternalStorageWritable()) {
+            mReason = "External data storage is not writable";
             return false;
+        }
+
 
         // Make the directory.
         String storageRoot = Environment.getExternalStorageDirectory().toString();
         File saveDir = new File(storageRoot + "/MoodTrackerData");
         if (! saveDir.isDirectory()) {
-            if (! saveDir.mkdirs())
+            if (! saveDir.mkdirs()) {
+                mReason = "Failed to make storage directory!";
                 return false;
+            }
+
         }
 
         // MTP has an indefinite delay in scanning new files. We keep track of new files
@@ -69,6 +77,11 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
             return false;
         }
 
+        // Export app usage data.
+        if (!exportTextMsg(saveDir, filesToScan)) {
+            return false;
+        }
+
         for (Uri uri : filesToScan) {
             mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
         }
@@ -77,13 +90,13 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
 
     @Override
     protected void onPostExecute(Boolean success) {
-        onFinish(success);
+        onFinish(success, mReason);
     }
 
     /**
      * Override this method to get result of query.
      */
-    public abstract void onFinish(boolean success);
+    public abstract void onFinish(boolean success, String reason);
 
     /**
      * Checks if external storage is available for write
@@ -122,7 +135,7 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
                 rootObject = appUsageListToJSON(oneDayEntries);
             }
             catch (JSONException e) {
-                Log.e(TAG, "Converting day " + date + " usage to JSON failed");
+                mReason = "Converting day " + date + " usage to JSON failed";
                 return false;
             }
 
@@ -136,7 +149,7 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
                 filesToScan.add(Uri.fromFile(saveFile));
             }
             catch (IOException e) {
-                Log.e(TAG, "Writing day " + date + " app usage to file failed");
+                mReason = "Writing day " + date + " app usage to file failed";
                 return false;
             }
         }
@@ -150,7 +163,6 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
             JSONObject usageObject = entry.toJSON();
             usageArray.put(usageObject);
         }
-
         rootObject.put("AppUsage", usageArray);
         return rootObject;
     }
@@ -186,7 +198,7 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
                 rootObject = surveyListToJSON(oneDayEntries);
             }
             catch (JSONException e) {
-                Log.e(TAG, "Converting day " + date + " survey to JSON failed");
+                mReason = "Converting day " + date + " survey to JSON failed";
                 return false;
             }
 
@@ -200,7 +212,7 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
                 filesToScan.add(Uri.fromFile(saveFile));
             }
             catch (IOException e) {
-                Log.e(TAG, "Writing day " + date + " survey info to file failed");
+                mReason = "Writing day " + date + " survey info to file failed";
                 return false;
             }
         }
@@ -217,6 +229,68 @@ public abstract class ExportDataTask extends AsyncTask<Integer, Integer, Boolean
         }
 
         rootObject.put("SurveyInfo", usageArray);
+        return rootObject;
+    }
+
+    private boolean exportTextMsg(File saveDir, ArrayList<Uri> filesToScan) {
+
+        // Pull data from database.
+        List<TextMsgEntry> allEntries = mDatabase.readTextMsg(false);
+        HashMap<Long, List<TextMsgEntry> > entriesByDay = new HashMap<Long, List<TextMsgEntry>>();
+
+        for (TextMsgEntry entry : allEntries) {
+            long daysSinceEpoch = TrackDateUtil.getDaysSinceEpoch(new Date(entry.date));
+            if (!entriesByDay.containsKey(daysSinceEpoch)) {
+                entriesByDay.put(daysSinceEpoch, new ArrayList<TextMsgEntry>());
+            }
+            entriesByDay.get(daysSinceEpoch).add(entry);
+        }
+
+        for (long date : entriesByDay.keySet()) {
+
+            File saveFile = new File(saveDir, "TextMsg" + String.valueOf(date) + ".json");
+            if (saveFile.exists()) {
+                if (date == TrackDateUtil.getDaysSinceEpoch() )
+                    Log.d(TAG, "deleting today (" + date + ") text msg file: " + (saveFile.delete() ? "success" : "fail"));
+                else
+                    continue;
+            }
+
+            List<TextMsgEntry> oneDayEntries = entriesByDay.get(date);
+            JSONObject rootObject;
+            try {
+                rootObject = textMsgListToJSON(oneDayEntries);
+            }
+            catch (JSONException e) {
+                mReason = "Converting day " + date + " text msg to JSON failed";
+                return false;
+            }
+
+            try  {
+                FileOutputStream fOut = new FileOutputStream(saveFile);
+                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+                myOutWriter.write(rootObject.toString());
+                myOutWriter.flush();
+                myOutWriter.close();
+                fOut.close();
+                filesToScan.add(Uri.fromFile(saveFile));
+            }
+            catch (IOException e) {
+                mReason = "Writing day " + date + " text msg to file failed";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private JSONObject textMsgListToJSON(List<TextMsgEntry> entriesList) throws JSONException {
+        JSONObject rootObject = new JSONObject();
+        JSONArray usageArray = new JSONArray();
+        for (TextMsgEntry entry : entriesList) {
+            JSONObject usageObject = entry.toJSON();
+            usageArray.put(usageObject);
+        }
+        rootObject.put("Messages", usageArray);
         return rootObject;
     }
 }

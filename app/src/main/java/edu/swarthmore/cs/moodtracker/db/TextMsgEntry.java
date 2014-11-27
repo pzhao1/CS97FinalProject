@@ -1,6 +1,10 @@
 package edu.swarthmore.cs.moodtracker.db;
 
 import android.database.Cursor;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import edu.swarthmore.cs.moodtracker.db.TrackContract.TextMsgInfoSchema;
 /**
  * Created by cwang3 on 11/26/14.
@@ -46,5 +50,23 @@ public class TextMsgEntry {
         this.negative = cursor.getDouble(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_NEG));
 
         cursor.moveToNext();
+    }
+
+    /**
+     * Converts class to a JSON object. Used for exporting data.
+     * @return The JSON representation of this class.
+     */
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonObj = new JSONObject();
+        jsonObj.put("id", this.id);
+        jsonObj.put("data", this.date);
+        jsonObj.put("sender", this.sender);
+        jsonObj.put("receiver", this.receiver);
+        jsonObj.put("type", this.type);
+        jsonObj.put("message", this.message);
+        jsonObj.put("neutral", this.neutral);
+        jsonObj.put("positive", this.positive);
+        jsonObj.put("negative", this.negative);
+        return jsonObj;
     }
 }

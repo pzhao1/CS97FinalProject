@@ -95,23 +95,18 @@ public class AppUsageEntry {
      * Converts class to a JSON object. Used for exporting data.
      * @return The JSON representation of this class.
      */
-    public JSONObject toJSON() {
-        try {
-            JSONObject jsonObj = new JSONObject();
-            jsonObj.put(JSON_PACKAGE_NAME, PackageName);
-            jsonObj.put(JSON_APP_NAME, AppName);
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonObj = new JSONObject();
+        jsonObj.put(JSON_PACKAGE_NAME, PackageName);
+        jsonObj.put(JSON_APP_NAME, AppName);
 
-            //byte[] bytes = getIconInByteArray();
-            //String iconEncodedString = Base64.encodeToString(bytes, Base64.DEFAULT);
-            //jsonObj.put(JSON_APP_ICON, iconEncodedString);
+        //byte[] bytes = getIconInByteArray();
+        //String iconEncodedString = Base64.encodeToString(bytes, Base64.DEFAULT);
+        //jsonObj.put(JSON_APP_ICON, iconEncodedString);
 
-            jsonObj.put(JSON_USAGE, UsageTimeSec);
-            jsonObj.put(JSON_DATE, DaysSinceEpoch);
-            return jsonObj;
-        }
-        catch (JSONException e) {
-            return null;
-        }
+        jsonObj.put(JSON_USAGE, UsageTimeSec);
+        jsonObj.put(JSON_DATE, DaysSinceEpoch);
+        return jsonObj;
     }
 
 
