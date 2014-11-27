@@ -17,8 +17,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.Calendar;
+import org.w3c.dom.Text;
 
+import java.util.Calendar;
+import java.util.List;
+
+import edu.swarthmore.cs.moodtracker.db.TextMsgEntry;
+import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 import edu.swarthmore.cs.moodtracker.receivers.NotificationAlarmReceiver;
 import edu.swarthmore.cs.moodtracker.receivers.CollectTextMsgReceiver;
 import edu.swarthmore.cs.moodtracker.services.TrackService;
@@ -66,6 +71,8 @@ public class MainActivity extends FragmentActivity
         setNotificationForSurvey();
         setUpTextMsgCollecting();
 
+        TrackDatabase db = TrackDatabase.getInstance(this);
+        List<TextMsgEntry> entries = db.read
     }
 
     @Override
