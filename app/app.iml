@@ -79,17 +79,10 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-<<<<<<< HEAD
     <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-20.0.0" level="project" />
-    <orderEntry type="library" exported="" name="bolts-android-1.1.2" level="project" />
-=======
     <orderEntry type="library" exported="" name="support-v4-20.0.0" level="project" />
     <orderEntry type="library" exported="" name="commons-math3-3.3" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
->>>>>>> 9c27c11076d9bc2503cb3640dbf91b823a8bc62f
     <orderEntry type="module" module-name="ViewPagerIndicatorLibrary" exported="" />
-    <orderEntry type="module" module-name="facebook" exported="" />
   </component>
 </module>
 
