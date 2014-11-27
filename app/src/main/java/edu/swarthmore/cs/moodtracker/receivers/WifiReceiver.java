@@ -4,11 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.util.Log;
+import android.net.NetworkInfo;
 
-import java.util.List;
-
-import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
 import edu.swarthmore.cs.moodtracker.db.QuerySentimentTask;
 
 /**
@@ -19,11 +16,10 @@ public class WifiReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive called");
         ConnectivityManager mConManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        boolean wifi = mConManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-        if (wifi) {
-            Log.d(TAG, "Wifi is on!");
+        NetworkInfo activeNetwork = mConManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
+        if (isConnected) {
             new QuerySentimentTask(context) {
                 @Override
                 public void onFinish(boolean success, String error) {

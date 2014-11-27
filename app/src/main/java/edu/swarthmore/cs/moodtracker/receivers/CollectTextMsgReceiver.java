@@ -77,8 +77,9 @@ public class CollectTextMsgReceiver extends BroadcastReceiver {
         }
 
         ConnectivityManager mConManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        boolean wifi = mConManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-        if (wifi) {
+        NetworkInfo activeNetwork = mConManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
+        if (isConnected) {
             new QuerySentimentTask(context) {
                 @Override
                 public void onFinish(boolean success, String error) {
