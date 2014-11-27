@@ -12,9 +12,9 @@ public class TextMsgEntry {
     public String receiver;
     public int type;
     public String message;
-    public double neutral;
-    public double positive;
-    public double negative;
+    public double neutral = -1.0;
+    public double positive = -1.0;
+    public double negative = -1.0;
 
     // Constructor
     public TextMsgEntry(int id, long date, String sender, String receiver, int type,
@@ -41,8 +41,10 @@ public class TextMsgEntry {
         this.receiver = cursor.getString(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_RECEIVER));
         this.type = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_TYPE));
         this.message = cursor.getString(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_MESSAGE));
-        this.neutral = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_NEUTRAL));
-        this.positive = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_POS));
-        this.negative = cursor.getInt(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_NEG));
+        this.neutral = cursor.getDouble(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_NEUTRAL));
+        this.positive = cursor.getDouble(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_POS));
+        this.negative = cursor.getDouble(cursor.getColumnIndex(TextMsgInfoSchema.COLUMN_NEG));
+
+        cursor.moveToNext();
     }
 }
