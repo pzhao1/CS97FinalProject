@@ -17,14 +17,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
-import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
-import edu.swarthmore.cs.moodtracker.db.TextMsgEntry;
-import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 import edu.swarthmore.cs.moodtracker.receivers.NotificationAlarmReceiver;
-import edu.swarthmore.cs.moodtracker.receivers.getLastDayMsgReceiver;
+import edu.swarthmore.cs.moodtracker.receivers.CollectTextMsgReceiver;
 import edu.swarthmore.cs.moodtracker.services.TrackService;
 
 
@@ -202,7 +198,7 @@ public class MainActivity extends FragmentActivity
         Log.d("setUpTextMsgCollecting", "called");
         PendingIntent mPendingIntent;
         AlarmManager mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        Intent myIntent = new Intent(this, getLastDayMsgReceiver.class);
+        Intent myIntent = new Intent(this, CollectTextMsgReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(this, 100, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Calendar mCalendar = Calendar.getInstance();
         if (mCalendar.get(Calendar.HOUR_OF_DAY)>=2) {

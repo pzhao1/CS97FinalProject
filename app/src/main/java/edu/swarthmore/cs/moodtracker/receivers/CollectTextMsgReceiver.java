@@ -4,14 +4,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
+import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
+import edu.swarthmore.cs.moodtracker.db.QuerySentimentTask;
 import edu.swarthmore.cs.moodtracker.db.TextMsgEntry;
 import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
 
@@ -19,8 +25,8 @@ import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
  * Created by cwang3 on 11/9/14.
  * Collect one day of text messages
  */
-public class getLastDayMsgReceiver extends BroadcastReceiver {
-    public static final String TAG = "getLastDayMsgReceiver";
+public class CollectTextMsgReceiver extends BroadcastReceiver {
+    public static final String TAG = "CollectTextMsgReceiver";
     private TrackDatabase mDatabase;
 
     @Override
@@ -69,6 +75,19 @@ public class getLastDayMsgReceiver extends BroadcastReceiver {
             }
             cur.close();
         }
+
+        ConnectivityManager mConManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        boolean wifi = mConManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+        if (wifi) {
+            new QuerySentimentTask(context) {
+                @Override
+                public void onFinish(List<AppUsageEntry> result) {
+
+                }
+            }.execute();
+        }
+
+
         //tryRegression();
 
     }
