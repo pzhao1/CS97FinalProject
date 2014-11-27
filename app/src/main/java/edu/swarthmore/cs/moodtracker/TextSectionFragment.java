@@ -165,7 +165,7 @@ public class TextSectionFragment extends Fragment {
                 return true;
 
             } catch (Exception e) {
-                mError = e.toString();
+                mError = "Error! Are you connected to the network?";
                 return false;
             }
         }

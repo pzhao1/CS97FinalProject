@@ -3,14 +3,21 @@ package edu.swarthmore.cs.moodtracker.db;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import edu.swarthmore.cs.moodtracker.services.TrackService;
-import edu.swarthmore.cs.moodtracker.util.TrackDateUtil;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -21,10 +28,11 @@ import edu.swarthmore.cs.moodtracker.util.TrackDateUtil;
  * Pass in startDate = -1 to read from beginning of time.
  * Pass in endDate = -1 to read until end of time.
  */
-public abstract class QuerySentimentTask extends AsyncTask<Long, Integer, List<AppUsageEntry> > {
-    private TrackDatabase mDatabase;
-    private TrackService mService;
-    private long mCurrentDate = TrackDateUtil.getDaysSinceEpoch();
+public abstract class QuerySentimentTask extends AsyncTask<Integer, Integer, Boolean> {
+    private final String NLTK_URL = "http://text-processing.com/api/sentiment/";
+
+    private TrackDatabase mDatabase = null;
+    private String mError = "";
 
     /**
      * Construct a ReadAppUsageTask that read app usages from database.
@@ -32,79 +40,80 @@ public abstract class QuerySentimentTask extends AsyncTask<Long, Integer, List<A
      */
     public QuerySentimentTask(Context context) {
         mDatabase = TrackDatabase.getInstance(context);
-        mService = null;
     }
 
-
     @Override
-    protected List<AppUsageEntry> doInBackground(Long... params) {
-        if (params.length < 2 || params.length > 3)
-            return null;
+    protected Boolean doInBackground(Integer... params) {
 
-        // Parse parameters
-        long startDate = params[0], endDate = params[1];
-        int displayLimit = (params.length > 2 && params[2] != null) ? params[2].intValue() : -1;
+        List<TextMsgEntry> negativeEntries = mDatabase.readTextMsg(true);
+        HttpClient httpclient = new DefaultHttpClient();
 
-        // Query db and service to get app usage.
-        ArrayList<AppUsageEntry> dbResult = mDatabase.readAppUsage(startDate, endDate);
-        List<AppUsageEntry> serviceResult = (mService != null) ? mService.getTodayAppUsage() : null;
+        for (TextMsgEntry entry:negativeEntries) {
 
-        // If service doesn't have any today's app usage yet, get today's app usage from DB.
-        // This could happen when service itself reads from DB.
-        boolean getTodayUsageFromDB = (serviceResult == null);
+            // Create new http post request.
+            HttpPost httppost = new HttpPost(NLTK_URL);
+            try {
+                // Add your data.
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                nameValuePairs.add(new BasicNameValuePair("text", entry.message));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-        // Sum usage time for every app.
-        HashMap<String, AppUsageEntry> resultMap = new HashMap<String, AppUsageEntry>();
+                // Execute HTTP Post Request.
+                HttpResponse response = httpclient.execute(httppost);
 
-        for (AppUsageEntry entry:dbResult){
-            // If we want to get today's usage from service, ignore today's entries.
-            if (!getTodayUsageFromDB && entry.DaysSinceEpoch >= mCurrentDate)
-                continue;
+                // Check if we have a valid resposne.
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    mError = "Got HTTP 400 Error: Bad request";
+                    return false;
+                }
 
-            if (resultMap.containsKey(entry.PackageName))
-                resultMap.get(entry.PackageName).UsageTimeSec += entry.UsageTimeSec;
-            else
-                resultMap.put(entry.PackageName, entry);
-        }
+                // Read response into a JSON object.
+                BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+                String strResponse = "";
+                for (String line = null; (line = reader.readLine()) != null; ) {
+                    strResponse += (line + "\n");
+                }
+                JSONObject responseObject = new JSONObject(strResponse);
 
-        if (serviceResult != null) {
-            for (AppUsageEntry entry:serviceResult) {
-                if (resultMap.containsKey(entry.PackageName))
-                    resultMap.get(entry.PackageName).UsageTimeSec += entry.UsageTimeSec;
-                else
-                    resultMap.put(entry.PackageName, entry);
+                // Populate the entry.
+                JSONObject probability = responseObject.getJSONObject("probability");
+                entry.positive = probability.getDouble("pos");
+                entry.negative = probability.getDouble("neg");
+                entry.neutral = probability.getDouble("neutral");
+
+                if (entry.positive < 0 || entry.negative < 0 || entry.neutral < 0) {
+                    mError = "Got negative value from NLTK";
+                    return false;
+                }
+
+            } catch (JSONException e) {
+                mError = "Caught JSON exception. Not handling format properly";
+                return false;
+            } catch (UnknownHostException e) {
+                mError = "Host nltk cannot be resolved. Are you connected to network?";
+                return false;
+            } catch (Exception e) {
+                mError = "Caught unknown exception: " + e.toString();
+                return false;
             }
         }
 
-        // Get a list and return it.
-        List<AppUsageEntry> resultList = new ArrayList<AppUsageEntry>(resultMap.values());
-        Collections.sort(resultList, new AppUsageEntryComparator());
-        if (displayLimit >= 0 && displayLimit < resultList.size()) {
-            resultList = resultList.subList(0, displayLimit);
+        for (TextMsgEntry entry : negativeEntries) {
+            mDatabase.writeTextMsgRecord(entry);
         }
-        return resultList;
+
+        return true;
     }
 
     @Override
-    protected void onPostExecute(List<AppUsageEntry> result) {
-        onFinish(result);
+    protected void onPostExecute(Boolean success) {
+        onFinish(success, mError);
     }
 
     /**
      * Override this method to get result of query.
-     * @param result A list of sorted AppUsageEntries. DisplayLimit applied.
      */
-    public abstract void onFinish(List<AppUsageEntry> result);
+    public abstract void onFinish(boolean success, String error);
 
-    /**
-     * Comparator for two AppUsageEntries. Used in sorting the list.
-     */
-    private class AppUsageEntryComparator implements Comparator<AppUsageEntry> {
-        @Override
-        public int compare(AppUsageEntry entry1, AppUsageEntry entry2)
-        {
-            return  (entry2.UsageTimeSec - entry1.UsageTimeSec);
-        }
-    }
 
 }
