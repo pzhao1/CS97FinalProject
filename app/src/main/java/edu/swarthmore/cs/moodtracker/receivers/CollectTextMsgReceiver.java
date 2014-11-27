@@ -7,16 +7,13 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
-import edu.swarthmore.cs.moodtracker.db.AppUsageEntry;
 import edu.swarthmore.cs.moodtracker.db.QuerySentimentTask;
 import edu.swarthmore.cs.moodtracker.db.TextMsgEntry;
 import edu.swarthmore.cs.moodtracker.db.TrackDatabase;
@@ -80,10 +77,11 @@ public class CollectTextMsgReceiver extends BroadcastReceiver {
         NetworkInfo activeNetwork = mConManager.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
         if (isConnected) {
+            Log.d(TAG, "Start querying sentiment");
             new QuerySentimentTask(context) {
                 @Override
                 public void onFinish(boolean success, String error) {
-
+                    Log.d(TAG, "query sentiment " + ((success) ? "success!" : "failed because of " + error));
                 }
             }.execute();
         }
