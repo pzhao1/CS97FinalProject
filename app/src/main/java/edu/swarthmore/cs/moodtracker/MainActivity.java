@@ -71,8 +71,9 @@ public class MainActivity extends FragmentActivity
         setNotificationForSurvey();
         setUpTextMsgCollecting();
 
-        TrackDatabase db = TrackDatabase.getInstance(this);
-        List<TextMsgEntry> entries = db.read
+        //TrackDatabase db = TrackDatabase.getInstance(this);
+        //List<TextMsgEntry> entries = db.readTextMsg(false);
+
     }
 
     @Override
