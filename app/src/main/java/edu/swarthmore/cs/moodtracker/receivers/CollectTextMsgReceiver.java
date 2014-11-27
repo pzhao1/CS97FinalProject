@@ -65,7 +65,6 @@ public class CollectTextMsgReceiver extends BroadcastReceiver {
                     String receiver = cur.getString(cur.getColumnIndex("address"));
                     String message = cur.getString(cur.getColumnIndex("body"));
                     Integer type = cur.getInt(cur.getColumnIndex("type"));
-                    Log.d(TAG, message);
                     TextMsgEntry entry = new TextMsgEntry(id,date,sender,receiver,type,message,-1,-1,-1);
                     mDatabase.writeTextMsgRecord(entry);
                 } while (cur.moveToNext());

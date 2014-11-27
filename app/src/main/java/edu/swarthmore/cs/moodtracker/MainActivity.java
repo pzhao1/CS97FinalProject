@@ -68,6 +68,7 @@ public class MainActivity extends FragmentActivity
 
         setNotificationForSurvey();
         setUpTextMsgCollecting();
+
         //testTextMsg();
     }
 

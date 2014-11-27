@@ -1,7 +1,10 @@
 package edu.swarthmore.cs.moodtracker.db;
 
 import android.content.Context;
+import android.nfc.Tag;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -30,7 +33,7 @@ import java.util.List;
  */
 public abstract class QuerySentimentTask extends AsyncTask<Integer, Integer, Boolean> {
     private final String NLTK_URL = "http://text-processing.com/api/sentiment/";
-
+    private Context mContext = null;
     private TrackDatabase mDatabase = null;
     private String mError = "";
 
@@ -40,6 +43,7 @@ public abstract class QuerySentimentTask extends AsyncTask<Integer, Integer, Boo
      */
     public QuerySentimentTask(Context context) {
         mDatabase = TrackDatabase.getInstance(context);
+        mContext = context;
     }
 
     @Override
@@ -49,7 +53,6 @@ public abstract class QuerySentimentTask extends AsyncTask<Integer, Integer, Boo
         HttpClient httpclient = new DefaultHttpClient();
 
         for (TextMsgEntry entry:negativeEntries) {
-
             // Create new http post request.
             HttpPost httppost = new HttpPost(NLTK_URL);
             try {
