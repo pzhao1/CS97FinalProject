@@ -81,7 +81,7 @@ public class CollectTextMsgReceiver extends BroadcastReceiver {
         if (wifi) {
             new QuerySentimentTask(context) {
                 @Override
-                public void onFinish(List<AppUsageEntry> result) {
+                public void onFinish(boolean success, String error) {
 
                 }
             }.execute();

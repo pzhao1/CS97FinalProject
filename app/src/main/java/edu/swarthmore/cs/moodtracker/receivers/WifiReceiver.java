@@ -26,7 +26,7 @@ public class WifiReceiver extends BroadcastReceiver{
             Log.d(TAG, "Wifi is on!");
             new QuerySentimentTask(context) {
                 @Override
-                public void onFinish(List<AppUsageEntry> result) {
+                public void onFinish(boolean success, String error) {
 
                 }
             }.execute();
