@@ -14,14 +14,14 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center">
 
         <TextView
             android:layout_width="wrap_content"
             android:id="@android:id/text1"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:padding="@dimen/survey_text_padding"
             android:textStyle="bold"
             android:textSize="@dimen/survey_entry_number_field"
             />
@@ -31,7 +31,6 @@
             android:id="@android:id/text2"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:padding="@dimen/survey_text_padding"
             android:textSize="@dimen/survey_entry_date_field"
             />
 

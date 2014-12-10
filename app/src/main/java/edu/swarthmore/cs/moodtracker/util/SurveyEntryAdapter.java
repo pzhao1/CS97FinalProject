@@ -37,10 +37,10 @@ public class SurveyEntryAdapter extends ArrayAdapter<SurveyEntry> {
 
         SurveyEntry entry = getItem(position);
         if (entry != null) {
-            TextView numberField = (TextView) view.findViewById(android.R.id.text2);
-            numberField.setText("Survey Number :" + position);
+            TextView numberField = (TextView) view.findViewById(android.R.id.text1);
+            numberField.setText("Survey Number " + (position + 1));
 
-            TextView dateField = (TextView) view.findViewById(android.R.id.text1);
+            TextView dateField = (TextView) view.findViewById(android.R.id.text2);
             dateField.setText(mDateFormat.format(entry.getDate()));
         }
 
