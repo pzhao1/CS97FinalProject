@@ -47,7 +47,7 @@
     </style>
 
     <style name="DrawerRowText" parent="WhiteText">
-        <item name="android:typeface">sans</item>
+        <item name="android:typeface">serif</item>
         <item name="android:textSize">@dimen/navigation_drawer_text_size</item>
     </style>
 

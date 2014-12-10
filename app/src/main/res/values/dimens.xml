@@ -49,5 +49,6 @@
     <dimen name="take_survey_text">20sp</dimen>
 
     <dimen name="survey_entry_date_field">14dp</dimen>
+    <dimen name="survey_entry_number_field">18dp</dimen>
 
 </resources>
