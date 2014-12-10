@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.etiennelawlor.quickreturn.library.enums.QuickReturnType;
+import com.etiennelawlor.quickreturn.library.listeners.QuickReturnListViewOnScrollListener;
+
 import java.util.List;
 
 import edu.swarthmore.cs.moodtracker.db.SurveyEntry;
@@ -37,6 +40,10 @@ public class SurveySectionFragment extends Fragment {
         mTextView = (TextView) rootView.findViewById(R.id.take_survey_button);
         mDatabase = TrackDatabase.getInstance(getActivity());
         mListView = (ListView) rootView.findViewById(android.R.id.list);
+
+        int footerHeight = getActivity().getResources().getDimensionPixelSize(R.dimen.take_survey_button);
+        QuickReturnListViewOnScrollListener onScrollListener = new QuickReturnListViewOnScrollListener(QuickReturnType.FOOTER, null, 0, mTextView, footerHeight);
+        mListView.setOnScrollListener(onScrollListener);
 
         return rootView;
     }
