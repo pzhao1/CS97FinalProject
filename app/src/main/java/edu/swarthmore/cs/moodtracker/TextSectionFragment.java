@@ -180,6 +180,8 @@ public class TextSectionFragment extends Fragment {
             else {
                 mResultText.setText(mError);
             }
+
+            mClassifyInput.setText(null);
         }
     }
 
