@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -24,6 +26,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 //import com.aliasi.classify.JointClassifier;
@@ -40,8 +43,10 @@ public class TextSectionFragment extends Fragment {
     private View mWaitingView = null;
     private View mContentView = null;
     private EditText mClassifyInput = null;
-    private Button mClassifyBtn = null;
+    private TextView mClassifyBtn = null;
     private TextView mResultText = null;
+    private HashMap<String, String> mResults;
+    private HashMap<String, Integer> mResultsColors;
     //private JointClassifier<CharSequence> mPolarityClassifier;
 
     /**
@@ -61,6 +66,17 @@ public class TextSectionFragment extends Fragment {
         mContentView = rootView.findViewById(R.id.text_analysis_content_view);
         mWaitingView.setVisibility(View.VISIBLE);
         mContentView.setVisibility(View.GONE);
+
+        mResults = new HashMap<String, String>();
+        mResults.put("pos", "Positive");
+        mResults.put("neg", "Negative");
+        mResults.put("neutral", "Neutral");
+
+
+        mResultsColors = new HashMap<String, Integer>();
+        mResultsColors.put("pos", 0xFF228b22);
+        mResultsColors.put("neg", 0xFFFF4500);
+        mResultsColors.put("neutral", 0xFFFFD700);
 
         //(new LoadClassifierTask()).execute();
         setupRemoteClassifyUI();
@@ -99,7 +115,7 @@ public class TextSectionFragment extends Fragment {
         mContentView.setVisibility(View.VISIBLE);
 
         mClassifyInput = (EditText) mContentView.findViewById(R.id.text_analysis_input_field);
-        mClassifyBtn = (Button) mContentView.findViewById(R.id.text_analysis_classify_btn);
+        mClassifyBtn = (TextView) mContentView.findViewById(R.id.text_analysis_classify_btn);
         mResultText = (TextView) mContentView.findViewById(R.id.text_analysis_result_text);
 
         mClassifyBtn.setOnClickListener(new View.OnClickListener() {
@@ -175,7 +191,12 @@ public class TextSectionFragment extends Fragment {
             super.onPostExecute(success);
 
             if (success) {
-                mResultText.setText(mResult);
+                String result = "Sentiment for \"" + mClassifyInput.getText() + "\": " + mResults.get(mResult);
+
+                int index = result.lastIndexOf(":");
+                SpannableString formattedString = new SpannableString(result);
+                formattedString.setSpan(new ForegroundColorSpan(mResultsColors.get(mResult)), index + 1, result.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                mResultText.setText(formattedString);
             }
             else {
                 mResultText.setText(mError);

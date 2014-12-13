@@ -41,13 +41,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:hint="Enter sentence to classify"
             android:textSize="20sp"
             android:layout_marginTop="20dp" />
 
-        <Button
+        <TextView
             android:id="@+id/text_analysis_classify_btn"
+            android:background="@drawable/selector_take_survey_btn"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingRight="20dp"
+            android:paddingLeft="20dp"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:textSize="25dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:text="@string/text_analysis_classify_btn_text"
             android:layout_marginTop="20dp" />
 
@@ -56,6 +65,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:textAlignment="center"
+            android:gravity="center"
             android:text=""
             android:textSize="20sp"/>
 
